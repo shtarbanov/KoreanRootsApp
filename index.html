@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="author" content="Ali Shtarbanov">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>KoreanRootsApp</title>
+<style>
+:root{--bg:#fafaf7;--card:#fff;--fg:#1d1d1b;--mut:#6b6b66;--line:#e1e0d8;--acc:#1f4e9c;--kn:#fff59d;--knfg:#e0b400;--no:#c9722b;box-sizing:border-box}
+:root{--bg:#17181a;--card:#202225;--fg:#ececea;--mut:#9a9a94;--line:#34363a;--acc:#7aa7f0;--kn:#5c4f10;--knfg:#ffe14d;--no:#e5a066;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.5 "Noto Sans KR","Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif}
+body{padding:env(safe-area-inset-top,0) 0 env(safe-area-inset-bottom,0)}
+header{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:10px 16px;border-bottom:1px solid var(--line);background:var(--card)}
+header h1{font-size:17px;margin:0 auto 0 0}#rb{display:none}
+.st{font-size:13px;color:var(--mut)}.st.d{color:var(--no)}
+button{font:inherit;background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:4px 10px;cursor:pointer}
+button:hover{border-color:var(--acc)}
+
+
+.ic{display:inline-flex;align-items:center;justify-content:center;padding:5px 8px}
+.wrap{display:flex;gap:16px;padding:16px;align-items:flex-start}
+aside{width:190px;flex:none;display:flex;flex-direction:column;gap:3px}
+.ri{text-align:left;border-color:transparent;background:none;padding:3px 8px}
+.ri.on{background:var(--card);border-color:var(--acc)}
+.ri small{color:var(--mut)}.ri.kn{color:var(--knfg)}.ri.add{color:var(--acc);margin-top:6px}
+main{flex:1;min-width:0}
+footer{padding:12px 16px 20px;text-align:center;font-size:13px;color:var(--mut)}
+.top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
+h2{margin:0 auto 0 0;font-size:22px}.mm{font-size:16px;font-weight:400;color:var(--mut)}
+.scroll{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;margin-bottom:10px}
+table{border-collapse:collapse;width:100%}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+tr:last-child td{border-bottom:0}
+.wd{font-size:18px;white-space:nowrap}
+.wd.kn .syl{background:var(--kn);margin-right:0}
+.syl{cursor:pointer;padding:0 1px;margin-right:1px}
+.syl.self{cursor:text}
+.syl:hover{background:color-mix(in srgb,var(--acc) 18%,transparent)}
+.syl.self:hover{background:none}
+.syl.kn,[data-k].kn{color:var(--knfg);font-weight:600}
+.wd .syl.kn{color:inherit;font-weight:inherit}
+.syl sup{font-size:10px;color:var(--mut)}
+.bd{display:inline-block;margin:0 12px 2px 0}.g{color:var(--mut)}.g i{opacity:.7}
+#tip{position:fixed;z-index:20;background:var(--fg);color:var(--bg);padding:5px 10px;border-radius:6px;font-size:14px;display:none;box-shadow:0 2px 8px #0004}
+#tip label{cursor:pointer;display:flex;gap:6px;align-items:center}
+dialog{border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--fg);padding:16px 18px;width:min(440px,92vw)}
+#help{width:28px;height:28px;padding:0;border-radius:50%;border:none;background:var(--acc);color:var(--card);font-weight:700;font-size:16px;line-height:28px;margin-left:6px}#help:hover{opacity:.85}
+dialog.help{width:min(560px,94vw);max-height:88vh;overflow-y:auto}dialog.help h4{margin:14px 0 4px;font-size:14px}dialog.help p,dialog.help li{font-size:14px;margin:3px 0}dialog.help ul{margin:2px 0;padding-left:20px}dialog.help .kn{background:var(--kn);padding:0 3px;border-radius:3px}
+#sw{position:relative;padding:12px 16px 4px}
+#q{display:block;width:100%;max-width:560px;font:inherit;font-size:16px;padding:9px 12px 9px 38px;background:#2b2e33 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%23b5b5ae' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-4-4'/%3E%3C/svg%3E") no-repeat 12px center;color:var(--fg);border:1.5px solid #6a6e76;border-radius:8px}
+#q::placeholder{color:#b5b5ae;opacity:1}
+#q:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px #7aa7f040}
+#sr{display:none;position:absolute;z-index:15;left:16px;right:16px;top:calc(100% + 4px);max-width:520px;max-height:60vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:0 4px 14px #0003}
+.sri{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;padding:7px 12px}
+.sri:last-child{border-bottom:0}.sri:hover,.sri.on{background:var(--bg)}
+.sri small{color:var(--mut);margin-left:6px}.sri .tg{color:var(--acc);font-size:12px;margin-left:6px}
+.sre{padding:10px 12px;color:var(--mut);font-size:14px}
+@keyframes hit{from{background:var(--kn)}to{background:transparent}}
+tr.hit>td{animation:hit 2.2s ease-out}
+@media (max-width:700px){#sw{padding:8px 12px 0}#sr{left:12px;right:12px}#q{padding:10px 12px 10px 38px;max-width:none}}
+.sp{display:inline-flex;align-items:center;padding:3px 7px;margin-right:4px;color:var(--acc)}
+.sp.on{background:var(--kn)}
+.ac{white-space:nowrap}
+dialog select{display:block;width:100%;font:inherit;font-size:16px;padding:6px;margin-top:2px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:5px}
+.kb{display:inline-flex;align-items:center;padding:3px 8px;margin-right:4px;color:var(--mut)}
+.kb.on{background:var(--kn);border-color:var(--knfg);color:var(--knfg)}
+.bk{height:34px;margin-bottom:6px;display:flex;align-items:center}
+#back{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;font-size:14px}
+#back .ar{font-size:16px;line-height:1}
+.row2{display:flex;gap:10px;position:relative}.row2 label{flex:1;min-width:0}.row2 .tg{flex:none;width:76px}.row2 .tg input{text-align:center}.row2 .tl{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--mut);margin-top:8px}
+.tgi{width:18px;height:18px;padding:0;border-radius:50%;font-size:12px;line-height:16px;font-weight:700;color:var(--mut)}
+.tgn{position:absolute;left:0;right:0;top:100%;margin-top:6px;z-index:5;font-size:13px;line-height:1.4;padding:8px 10px;background:var(--fg);color:var(--bg);border-radius:6px;box-shadow:0 2px 8px #0006}
+.tgn[hidden]{display:none}
+dialog::backdrop{background:#0006}
+dialog h3{margin:0 0 8px}dialog label{display:block;font-size:13px;color:var(--mut);margin-top:8px}
+dialog input{display:block;width:100%;font:inherit;padding:4px 6px;margin-top:2px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:5px}
+.sub{margin-top:12px;font-size:13px;color:var(--mut)}
+.bx{display:flex;gap:6px;align-items:center;margin-top:4px}.bx b{font-size:18px;width:26px}.bx input{margin:0}.bx .t{width:54px}
+.btns{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+.pk{display:block;width:100%;text-align:left;margin-top:6px}
+@media (max-width:700px){
+header{padding:8px 12px;gap:6px}header h1{font-size:16px}.st{order:5;width:100%}
+button{min-height:38px;padding:4px 12px}
+.wrap{flex-direction:column;padding:10px 12px;gap:10px}
+aside{display:none;width:100%;flex-direction:row;flex-wrap:wrap;gap:6px}body.ro aside{display:flex}#rb{display:inline-block}.scroll{overflow:visible}
+.ri{white-space:nowrap;border-color:var(--line);flex:none;font-size:17px}.ri small{display:none}.ri.add{margin-top:0;font-size:14px}
+main{width:100%}h2{font-size:20px}.mm{font-size:14px}
+thead{display:none}table,tbody{display:block}
+tr{display:block;position:relative;padding:10px 52px 10px 12px;border-bottom:1px solid var(--line)}
+tr:last-child{border-bottom:0}
+td{display:block;border:0;padding:2px 0}
+td.wd{font-size:22px;width:fit-content;border-radius:4px}
+td:last-child{position:absolute;top:8px;right:8px;padding:0}
+.syl{padding:2px 2px}.bd{margin:2px 10px 2px 0}
+#tip{top:auto!important;bottom:calc(16px + env(safe-area-inset-bottom,0px));left:50%!important;transform:translateX(-50%);padding:10px 16px;font-size:16px;white-space:nowrap}
+#tc{width:20px;height:20px}
+dialog{width:94vw;max-height:88vh;overflow-y:auto;padding:14px}
+dialog input{font-size:16px;padding:8px}.bx .t{width:60px}
+}
+@media (hover:none){.syl:hover{background:none}}
+body{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+</style>
+</head>
+<body>
+<header><h1>KoreanRootsApp</h1><span class="st" id="st"></span>
+<button id="rb">☰ Roots</button><button id="load" class="ic" title="Import JSON" aria-label="Import JSON"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M2 15h10"/><path d="m9 18 3-3-3-3"/></svg></button><button id="save" class="ic" title="Export JSON" aria-label="Export JSON"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M2 15h10"/><path d="m5 12-3 3 3 3"/></svg></button><button id="help" title="How to use" aria-label="How to use">?</button><input type="file" id="file" accept=".json,application/json" hidden></header>
+<div id="sw"><input id="q" type="search" placeholder="Search words, roots, meanings…" aria-label="Search" autocomplete="off" spellcheck="false"><div id="sr" role="listbox"></div></div>
+<div class="wrap"><aside id="side"></aside><main id="main"></main></div>
+<footer>Created by Ali Shtarbanov</footer>
+<div id="tip"><label><input type="checkbox" id="tc"><span id="tl"></span></label></div>
+<script>
+const INIT={"roots":[{"c":"국","t":"","m":"country","h":"國","words":[{"w":"한국","m":"Korea","l":"(Han Country)","s":[{"c":"한","t":"","g":"Han (韓)"},{"c":"국","t":"","g":""}]},{"w":"중국","m":"China","l":"(Middle Country)","s":[{"c":"중","t":"","g":"middle, center (中)"},{"c":"국","t":"","g":""}]},{"w":"미국","m":"America","l":"(Beautiful Country)","s":[{"c":"미","t":"","g":"beautiful (美)"},{"c":"국","t":"","g":""}]},{"w":"영국","m":"Britain","l":"(Brilliant Country)","s":[{"c":"영","t":"","g":"brilliant / outstanding (英)"},{"c":"국","t":"","g":""}]},{"w":"외국","m":"foreign country","l":"(outside country)","s":[{"c":"외","t":"","g":"outside"},{"c":"국","t":"","g":""}]},{"w":"국적","m":"nationality","l":"(country record)","s":[{"c":"국","t":"","g":""},{"c":"적","t":"","g":"registration / record (籍)"}]}]},{"c":"인","t":"","m":"person","h":"人","words":[{"w":"한국인","m":"Korean","l":"(Han country Person)","s":[{"c":"한","t":"","g":""},{"c":"국","t":"","g":""},{"c":"인","t":"","g":""}]},{"w":"미국인","m":"American","l":"(beautiful country person)","s":[{"c":"미","t":"","g":""},{"c":"국","t":"","g":""},{"c":"인","t":"","g":""}]},{"w":"외국인","m":"foreigner","l":"(foreign country person)","s":[{"c":"외","t":"","g":""},{"c":"국","t":"","g":""},{"c":"인","t":"","g":""}]},{"w":"일본인","m":"Japanese","l":"(sun origin person)","s":[{"c":"일","t":"","g":"sun (日)"},{"c":"본","t":"","g":"origin, source (本)"},{"c":"인","t":"","g":""}]},{"w":"인기","m":"popularity","l":"(person energy)","s":[{"c":"인","t":"","g":""},{"c":"기","t":"","g":"energy / spirit (氣)"}]},{"w":"인구","m":"population","l":"(person mouth)","s":[{"c":"인","t":"","g":""},{"c":"구","t":"","g":"mouth"}]},{"w":"인형","m":"doll","l":"(person shape)","s":[{"c":"인","t":"","g":""},{"c":"형","t":"","g":"shape (形)"}]}]},{"c":"미","t":"","m":"beautiful","h":"美","words":[{"w":"미국","m":"America","l":"","s":[{"c":"미","t":"","g":""},{"c":"국","t":"","g":""}]},{"w":"미남","m":"handsome man","l":"","s":[{"c":"미","t":"","g":""},{"c":"남","t":"","g":"man (男)"}]},{"w":"미녀","m":"beautiful woman","l":"","s":[{"c":"미","t":"","g":""},{"c":"녀","t":"","g":"woman (女)"}]},{"w":"미인","m":"beautiful person","l":"","s":[{"c":"미","t":"","g":""},{"c":"인","t":"","g":""}]},{"w":"미술","m":"art (beautiful technique)","l":"","s":[{"c":"미","t":"","g":""},{"c":"술","t":"","g":"technique (術)"}]},{"w":"미술관","m":"art museum","l":"","s":[{"c":"미","t":"","g":""},{"c":"술","t":"","g":""},{"c":"관","t":"","g":"hall / building (館)"}]},{"w":"미용","m":"beauty care","l":"","s":[{"c":"미","t":"","g":""},{"c":"용","t":"","g":"appearance / face (容)"}]},{"w":"미용실","m":"beauty salon","l":"","s":[{"c":"미","t":"","g":""},{"c":"용","t":"","g":"appearance / face (容)"},{"c":"실","t":"","g":"room (室)"}]}]},{"c":"일","t":"","m":"day, sun","h":"日","words":[{"w":"일본","m":"Japan","l":"(sun origin)","s":[{"c":"일","t":"","g":""},{"c":"본","t":"","g":""}]},{"w":"생일","m":"birthday","l":"(birth day)","s":[{"c":"생","t":"","g":"birth (生)"},{"c":"일","t":"","g":""}]},{"w":"매일","m":"every day","l":"(every day)","s":[{"c":"매","t":"","g":"every"},{"c":"일","t":"","g":""}]},{"w":"일요일","m":"Sunday","l":"(sun day sun)","s":[{"c":"일","t":"","g":""},{"c":"요","t":"","g":"weekday marker (曜)"},{"c":"일","t":"","g":""}]},{"w":"일기","m":"diary","l":"(day record)","s":[{"c":"일","t":"","g":""},{"c":"기","t":"","g":"record"}]},{"w":"평일","m":"weekday","l":"(ordinary day)","s":[{"c":"평","t":"","g":"ordinary; level"},{"c":"일","t":"","g":""}]}]},{"c":"남","t":"","m":"man, male","h":"男","words":[{"w":"남자","m":"man","l":"(male child)","s":[{"c":"남","t":"","g":""},{"c":"자","t":"","g":"child (子)"}]},{"w":"남성","m":"masculine","l":"(male nature)","s":[{"c":"남","t":"","g":""},{"c":"성","t":"","g":"gender / nature (性)"}]},{"w":"남편","m":"husband","l":"(male side)","s":[{"c":"남","t":"","g":""},{"c":"편","t":"","g":"side (便)"}]},{"w":"남동생","m":"younger brother","l":"(male same birth)","s":[{"c":"남","t":"","g":""},{"c":"동","t":"","g":"same (同)"},{"c":"생","t":"","g":""}]},{"w":"남학생","m":"male student","l":"(male study birth)","s":[{"c":"남","t":"","g":""},{"c":"학","t":"","g":"study (學)"},{"c":"생","t":"","g":""}]},{"w":"남자친구","m":"boyfriend","l":"(male person friend)","s":[{"c":"남","t":"","g":""},{"c":"자","t":"","g":""},{"c":"친","t":"","g":"close, familiar (舊)"},{"c":"구","t":"","g":"old, ancient (親)"}]},{"w":"남녀","m":"men and women","l":"(man woman)","s":[{"c":"남","t":"","g":""},{"c":"녀","t":"","g":"woman (女)"}]},{"w":"남매","m":"brother and sister","l":"","s":[{"c":"남","t":"","g":""},{"c":"매","t":"","g":"younger sister (妹)"}]},{"w":"미남","m":"handsome man","l":"(beautiful male)","s":[{"c":"미","t":"","g":""},{"c":"남","t":"","g":""}]},{"w":"장남","m":"eldest son","l":"","s":[{"c":"장","t":"","g":"eldest / long (長)"},{"c":"남","t":"","g":""}]},{"w":"차남","m":"second son","l":"","s":[{"c":"차","t":"","g":"next / second (次)"},{"c":"남","t":"","g":""}]}]},{"c":"실","t":"","m":"room","h":"室","words":[{"w":"화장실","m":"restroom","l":"(makeup room)","s":[{"c":"화","t":"","g":"change (化)"},{"c":"장","t":"","g":"adorn (makeup) (粧)"},{"c":"실","t":"","g":""}]},{"w":"침실","m":"bedroom","l":"(sleep room)","s":[{"c":"침","t":"","g":"sleep (寢)"},{"c":"실","t":"","g":""}]},{"w":"교실","m":"classroom","l":"(teaching room)","s":[{"c":"교","t":"*","g":"teach (敎)"},{"c":"실","t":"","g":""}]},{"w":"밀실","m":"Secret room","l":"(secret room)","s":[{"c":"밀","t":"","g":"secret (密)"},{"c":"실","t":"","g":""}]},{"w":"욕실","m":"bathroom","l":"","s":[{"c":"욕","t":"","g":"bathe (浴)"},{"c":"실","t":"","g":""}]},{"w":"사무실","m":"office","l":"(affairs-duty room)","s":[{"c":"사","t":"ᕽ","g":"affairs (事)"},{"c":"무","t":"","g":"work, duty (務)"},{"c":"실","t":"","g":""}]}]},{"c":"생","t":"","m":"person born","h":"生","words":[{"w":"생일","m":"birthday","l":"(birth day)","s":[{"c":"생","t":"","g":""},{"c":"일","t":"","g":""}]},{"w":"남동생","m":"younger brother","l":"(male same birth)","s":[{"c":"남","t":"","g":""},{"c":"동","t":"","g":"same (同)"},{"c":"생","t":"","g":""}]},{"w":"여동생","m":"younger sister","l":"(female same birth)","s":[{"c":"여","t":"","g":"woman (女)"},{"c":"동","t":"","g":""},{"c":"생","t":"","g":""}]},{"w":"선생님","m":"teacher","l":"(before-born honorific)","s":[{"c":"선","t":"","g":"before (先)"},{"c":"생","t":"","g":""},{"c":"님","t":"","g":"honorific title"}]},{"w":"학생","m":"student","l":"(study person)","s":[{"c":"학","t":"","g":""},{"c":"생","t":"","g":""}]},{"w":"남학생","m":"male student","l":"(male study birth)","s":[{"c":"남","t":"","g":""},{"c":"학","t":"","g":""},{"c":"생","t":"","g":""}]},{"w":"대학생","m":"university student","l":"(big student)","s":[{"c":"대","t":"","g":""},{"c":"학","t":"","g":""},{"c":"생","t":"","g":""}]},{"w":"생활","m":"life, daily living","l":"(birth live)","s":[{"c":"생","t":"","g":""},{"c":"활","t":"","g":"alive / lively (活)"}]},{"w":"생선","m":"fish (as food)","l":"(raw fresh)","s":[{"c":"생","t":"","g":""},{"c":"선","t":"","g":"fresh (鮮)"}]}]},{"c":"침","t":"","m":"sleep","h":"寢","words":[{"w":"침실","m":"bedroom","l":"(sleep room)","s":[{"c":"침","t":"","g":""},{"c":"실","t":"","g":""}]},{"w":"침대","m":"bed","l":"(sleep platform)","s":[{"c":"침","t":"","g":""},{"c":"대","t":"ᐞ","g":"stand / platform (臺)"}]},{"w":"침구","m":"bedding","l":"(sleep gear)","s":[{"c":"침","t":"","g":""},{"c":"구","t":"","g":"tool / gear (具)"}]},{"w":"침낭","m":"sleeping bag","l":"(sleep bag)","s":[{"c":"침","t":"","g":""},{"c":"낭","t":"","g":"bag (囊)"}]}]},{"c":"교","t":"*","m":"teach","h":"敎","words":[{"w":"교실","m":"classroom","l":"(teaching room)","s":[{"c":"교","t":"*","g":""},{"c":"실","t":"","g":""}]},{"w":"교사","m":"teacher","l":"(teaching master)","s":[{"c":"교","t":"*","g":""},{"c":"사","t":"*","g":"master (師)"}]},{"w":"교수","m":"professor","l":"(teaching giver)","s":[{"c":"교","t":"*","g":""},{"c":"수","t":"","g":"give / confer (授)"}]},{"w":"교육","m":"education","l":"(teach raise)","s":[{"c":"교","t":"*","g":""},{"c":"육","t":"","g":"raise / nurture (育)"}]},{"w":"교과서","m":"textbook","l":"(teaching subject book)","s":[{"c":"교","t":"*","g":""},{"c":"과","t":"","g":"subject (科)"},{"c":"서","t":"","g":"book (書)"}]},{"w":"교회","m":"church","l":"(teaching gathering)","s":[{"c":"교","t":"*","g":""},{"c":"회","t":"","g":"gathering / assembly (會)"}]},{"w":"학교","m":"school","l":"(study teach)","s":[{"c":"학","t":"","g":""},{"c":"교","t":"*","g":""}]}]},{"c":"교","t":"ᐞ","m":"school","h":"校","words":[{"w":"교장","m":"principal","l":"(school head)","s":[{"c":"교","t":"ᐞ","g":""},{"c":"장","t":"","g":"head / chief (長)"}]},{"w":"교복","m":"school uniform","l":"(school clothes)","s":[{"c":"교","t":"ᐞ","g":""},{"c":"복","t":"","g":"clothes (服)"}]},{"w":"교문","m":"school gate","l":"(school gate)","s":[{"c":"교","t":"ᐞ","g":""},{"c":"문","t":"","g":"gate / door (門)"}]},{"w":"교정","m":"schoolyard","l":"(school garden)","s":[{"c":"교","t":"ᐞ","g":""},{"c":"정","t":"","g":"yard / garden (庭)"}]},{"w":"교가","m":"school song","l":"(school song)","s":[{"c":"교","t":"ᐞ","g":""},{"c":"가","t":"","g":"song (歌)"}]},{"w":"교훈","m":"school motto","l":"(school lesson)","s":[{"c":"교","t":"ᐞ","g":""},{"c":"훈","t":"","g":"lesson / teaching (訓)"}]},{"w":"교내","m":"on campus","l":"(school inside)","s":[{"c":"교","t":"ᐞ","g":""},{"c":"내","t":"","g":"inside (內)"}]}]},{"c":"학","t":"","m":"study, learning","h":"學","words":[{"w":"학생","m":"student","l":"","s":[{"c":"학","t":"","g":""},{"c":"생","t":"","g":""}]},{"w":"학교","m":"school","l":"","s":[{"c":"학","t":"","g":""},{"c":"교","t":"ᐞ","g":""}]},{"w":"대학교","m":"university","l":"(big school)","s":[{"c":"대","t":"*","g":"big"},{"c":"학","t":"","g":""},{"c":"교","t":"ᐞ","g":""}]},{"w":"대학생","m":"university student","l":"(big student)","s":[{"c":"대","t":"","g":""},{"c":"학","t":"","g":""},{"c":"생","t":"","g":""}]},{"w":"학년","m":"school year / grade","l":"","s":[{"c":"학","t":"","g":""},{"c":"년","t":"","g":"year (年)"}]},{"w":"학원","m":"private academy (hagwon)","l":"","s":[{"c":"학","t":"","g":""},{"c":"원","t":"","g":"institution"}]},{"w":"방학","m":"school vacation","l":"","s":[{"c":"방","t":"","g":"release (放)"},{"c":"학","t":"","g":""}]},{"w":"입학","m":"entering a school","l":"","s":[{"c":"입","t":"","g":"enter"},{"c":"학","t":"","g":""}]},{"w":"유학","m":"studying abroad","l":"","s":[{"c":"유","t":"","g":"stay"},{"c":"학","t":"","g":""}]}]},{"c":"자","t":"","m":"child, son","h":"子","words":[{"w":"남자","m":"man","l":"(male child)","s":[{"c":"남","t":"","g":""},{"c":"자","t":"","g":""}]},{"w":"여자","m":"woman","l":"(female child)","s":[{"c":"여","t":"","g":"female (女)"},{"c":"자","t":"","g":""}]},{"w":"부자","m":"father and son","l":"(father child)","s":[{"c":"부","t":"","g":"father (父)"},{"c":"자","t":"","g":""}]},{"w":"모자","m":"mother and son","l":"(mother child)","s":[{"c":"모","t":"","g":"mother (母)"},{"c":"자","t":"","g":""}]},{"w":"자녀","m":"children","l":"(sons and daughters)","s":[{"c":"자","t":"","g":""},{"c":"녀","t":"","g":"daughter (女)"}]},{"w":"왕자","m":"prince","l":"(king child)","s":[{"c":"왕","t":"","g":"king (王)"},{"c":"자","t":"","g":""}]}]},{"c":"님","t":"","m":"honorific title","h":"","words":[{"w":"선생님","m":"teacher","l":"(before-born honorific)","s":[{"c":"선","t":"","g":"before (先)"},{"c":"생","t":"","g":""},{"c":"님","t":"","g":""}]},{"w":"부모님","m":"parents","l":"(father-mother honor.)","s":[{"c":"부","t":"","g":"father (父)"},{"c":"모","t":"","g":"mother (母)"},{"c":"님","t":"","g":""}]},{"w":"사장님","m":"boss","l":"(company head honor.)","s":[{"c":"사","t":"ᕻ","g":"company (社)"},{"c":"장","t":"","g":"head (長)"},{"c":"님","t":"","g":""}]},{"w":"고객님","m":"customer","l":"(patron guest honor.)","s":[{"c":"고","t":"","g":"patronize (顧)"},{"c":"객","t":"","g":"guest (客)"},{"c":"님","t":"","g":""}]},{"w":"손님","m":"guest, customer","l":"(guest honorific)","s":[{"c":"손","t":"","g":"guest ([K])"},{"c":"님","t":"","g":""}]},{"w":"형님","m":"older brother (respect.)","l":"(elder brother honorific)","s":[{"c":"형","t":"","g":"elder brother (兄)"},{"c":"님","t":"","g":""}]},{"w":"아드님","m":"(someone else's) son","l":"(son honorific)","s":[{"c":"아","t":"","g":""},{"c":"드","t":"","g":""},{"c":"님","t":"","g":""}]},{"w":"따님","m":"(someone else's) daughter","l":"(daughter honorific)","s":[{"c":"따","t":"","g":""},{"c":"님","t":"","g":""}]},{"w":"하느님","m":"God","l":"(heaven honorific)","s":[{"c":"하","t":"","g":""},{"c":"느","t":"","g":""},{"c":"님","t":"","g":""}]}]},{"c":"대","t":"*","m":"big, great","h":"大","words":[{"w":"대학교","m":"university","l":"(big school)\n(big study)","s":[{"c":"대","t":"*","g":""},{"c":"학","t":"","g":""},{"c":"교","t":"ᐞ","g":""}]},{"w":"대학생","m":"university student","l":"(big student)","s":[{"c":"대","t":"*","g":""},{"c":"학","t":"","g":""},{"c":"생","t":"","g":""}]},{"w":"대문","m":"main gate","l":"(great gate)","s":[{"c":"대","t":"*","g":""},{"c":"문","t":"","g":""}]},{"w":"동대문","m":"Dongdaemun","l":"(east great gate)","s":[{"c":"동","t":"","g":"east (東)"},{"c":"대","t":"*","g":""},{"c":"문","t":"","g":""}]},{"w":"대도시","m":"big city","l":"(big city)","s":[{"c":"대","t":"*","g":""},{"c":"도","t":"","g":"capital / city (都)"},{"c":"시","t":"","g":"city / market (市)"}]},{"w":"대한민국","m":"Republic of Korea","l":"(great Han people nation)","s":[{"c":"대","t":"*","g":""},{"c":"한","t":"","g":""},{"c":"민","t":"","g":"people (民)"},{"c":"국","t":"","g":""}]},{"w":"대통령","m":"president","l":"(great governing leader)","s":[{"c":"대","t":"*","g":""},{"c":"통","t":"","g":"govern / unite (統)"},{"c":"령","t":"","g":"leader (領)"}]},{"w":"대사관","m":"embassy","l":"(great envoy hall)","s":[{"c":"대","t":"*","g":""},{"c":"사","t":"ᕪ","g":"envoy / msngr (使)"},{"c":"관","t":"","g":""}]}]},{"c":"대","t":"ᐞ","m":"stand / platform","h":"臺","words":[{"w":"침대","m":"bed","l":"(sleep platform)","s":[{"c":"침","t":"","g":""},{"c":"대","t":"ᐞ","g":""}]},{"w":"무대","m":"stage","l":"(dance platform)","s":[{"c":"무","t":"","g":"dance (舞)"},{"c":"대","t":"ᐞ","g":""}]},{"w":"화장대","m":"dresser / vanity","l":"(makeup platform)","s":[{"c":"화","t":"","g":""},{"c":"장","t":"","g":"makeup (化粧)"},{"c":"대","t":"ᐞ","g":""}]},{"w":"계산대","m":"checkout counter","l":"(calculating platform)","s":[{"c":"계","t":"","g":"count (計)"},{"c":"산","t":"","g":"calculate (算)"},{"c":"대","t":"ᐞ","g":""}]},{"w":"전망대","m":"observation deck","l":"(view-looking platform)","s":[{"c":"전","t":"","g":"spread out / view (展)"},{"c":"망","t":"","g":"look (望)"},{"c":"대","t":"ᐞ","g":""}]},{"w":"세면대","m":"washstand / sink","l":"(face-washing platform)","s":[{"c":"세","t":"","g":"wash (洗)"},{"c":"면","t":"","g":"face (面)"},{"c":"대","t":"ᐞ","g":""}]}]},{"c":"사","t":"*","m":"master, expert, specialist","h":"師","words":[{"w":"의사","m":"doctor","l":"(medicine master)","s":[{"c":"의","t":"","g":"medicine (醫)"},{"c":"사","t":"*","g":""}]},{"w":"교사","m":"teacher","l":"(teach master)","s":[{"c":"교","t":"*","g":""},{"c":"사","t":"*","g":""}]},{"w":"약사","m":"pharmacist","l":"(medicine master)","s":[{"c":"약","t":"","g":"medicine, drug (藥)"},{"c":"사","t":"*","g":""}]},{"w":"간호사","m":"nurse","l":"(watch-protect master)","s":[{"c":"간","t":"","g":"watch, tend (看)"},{"c":"호","t":"","g":"protect (護)"},{"c":"사","t":"*","g":""}]}]},{"c":"사","t":"ᐞ","m":"scholar, professional","h":"士","words":[{"w":"변호사","m":"lawyer","l":"(argue-protect professional)","s":[{"c":"변","t":"","g":"argue / plead (辯)"},{"c":"호","t":"","g":"protect (護)"},{"c":"사","t":"ᐞ","g":""}]},{"w":"박사","m":"PhD holder","l":"(broad scholar)","s":[{"c":"박","t":"","g":"broad, wide (博)"},{"c":"사","t":"ᐞ","g":""}]},{"w":"석사","m":"master’s holder","l":"(eminent scholar)","s":[{"c":"석","t":"","g":"great, eminent (碩)"},{"c":"사","t":"ᐞ","g":""}]},{"w":"학사","m":"bachelor’s holder","l":"(study scholar)","s":[{"c":"학","t":"","g":""},{"c":"사","t":"ᐞ","g":""}]},{"w":"회계사","m":"accountant","l":"(accounting professional)","s":[{"c":"회","t":"","g":"gather, reckon (會)"},{"c":"계","t":"","g":"count (計)"},{"c":"사","t":"ᐞ","g":""}]},{"w":"세무사","m":"tax accountant","l":"(tax-duty professional)","s":[{"c":"세","t":"","g":"tax (稅)"},{"c":"무","t":"","g":"work, duty (務)"},{"c":"사","t":"ᐞ","g":""}]}]},{"c":"사","t":"ᕪ","m":"envoy / messenger","h":"使","words":[{"w":"대사","m":"ambassador","l":"(great envoy)","s":[{"c":"대","t":"*","g":""},{"c":"사","t":"ᕪ","g":""}]},{"w":"대사관","m":"embassy","l":"(great envoy hall)","s":[{"c":"대","t":"*","g":""},{"c":"사","t":"ᕪ","g":""},{"c":"관","t":"","g":""}]},{"w":"특사","m":"special envoy","l":"(special envoy)","s":[{"c":"특","t":"","g":"special (特)"},{"c":"사","t":"ᕪ","g":""}]},{"w":"사신","m":"envoy / emissary","l":"(envoy official)","s":[{"c":"사","t":"ᕪ","g":""},{"c":"신","t":"","g":"official / subject (臣)"}]},{"w":"천사","m":"angel","l":"(heaven messenger)","s":[{"c":"천","t":"","g":"heaven (天)"},{"c":"사","t":"ᕪ","g":""}]},{"w":"사명","m":"mission / calling","l":"(envoy order)","s":[{"c":"사","t":"ᕪ","g":""},{"c":"명","t":"","g":"order / command (命)"}]},{"w":"사용","m":"use","l":"(employ use)","s":[{"c":"사","t":"ᕪ","g":""},{"c":"용","t":"","g":"use (用)"}]}]},{"c":"사","t":"ᕻ","m":"company","h":"社","words":[{"w":"회사","m":"company","l":"(gathering company)","s":[{"c":"회","t":"","g":"gathering / assembly (會)"},{"c":"사","t":"ᕻ","g":""}]},{"w":"회사원","m":"office worker","l":"(company member)","s":[{"c":"회","t":"","g":""},{"c":"사","t":"ᕻ","g":""},{"c":"원","t":"","g":"member, employee (員)"}]},{"w":"사장","m":"president / boss","l":"(company head)","s":[{"c":"사","t":"ᕻ","g":""},{"c":"장","t":"","g":"head / chief (長)"}]},{"w":"사원","m":"employee","l":"(company member)","s":[{"c":"사","t":"ᕻ","g":""},{"c":"원","t":"","g":"member (員)"}]},{"w":"사회","m":"society","l":"(society gathering)","s":[{"c":"사","t":"ᕻ","g":""},{"c":"회","t":"","g":"gathering / assembly (會)"}]},{"w":"입사","m":"joining a company","l":"(enter company)","s":[{"c":"입","t":"","g":"enter (入)"},{"c":"사","t":"ᕻ","g":""}]},{"w":"퇴사","m":"leaving a company","l":"(leave company)","s":[{"c":"퇴","t":"","g":"retreat / leave (退)"},{"c":"사","t":"ᕻ","g":""}]},{"w":"본사","m":"headquarters","l":"(origin company)","s":[{"c":"본","t":"","g":"origin / source (本)"},{"c":"사","t":"ᕻ","g":""}]},{"w":"여행사","m":"travel agency","l":"(travel company)","s":[{"c":"여","t":"","g":"travel (旅)"},{"c":"행","t":"","g":"go (行)"},{"c":"사","t":"ᕻ","g":""}]}]},{"c":"사","t":"ᕽ","m":"affair, matter, work","h":"事","words":[{"w":"사무실","m":"office","l":"(affairs-duty room)","s":[{"c":"사","t":"ᕽ","g":""},{"c":"무","t":"","g":"work, duty (務)"},{"c":"실","t":"","g":""}]},{"w":"사건","m":"incident / case","l":"(affair item)","s":[{"c":"사","t":"ᕽ","g":""},{"c":"건","t":"","g":"matter, item (件)"}]},{"w":"사고","m":"accident","l":"(affair cause)","s":[{"c":"사","t":"ᕽ","g":""},{"c":"고","t":"","g":"cause, reason (故)"}]},{"w":"사실","m":"fact / truth","l":"(affair real)","s":[{"c":"사","t":"ᕽ","g":""},{"c":"실","t":"","g":"real, true (實) [not 室 “room”]"}]},{"w":"사업","m":"business","l":"(affair work)","s":[{"c":"사","t":"ᕽ","g":""},{"c":"업","t":"","g":"work, enterprise (業)"}]},{"w":"식사","m":"meal","l":"(eat affair)","s":[{"c":"식","t":"","g":"eat (食)"},{"c":"사","t":"ᕽ","g":""}]},{"w":"행사","m":"event","l":"(carry-out affair)","s":[{"c":"행","t":"","g":"go, carry out (行)"},{"c":"사","t":"ᕽ","g":""}]},{"w":"인사","m":"greeting","l":"(person affair)","s":[{"c":"인","t":"","g":""},{"c":"사","t":"ᕽ","g":""}]}]},{"c":"사","t":"ᐤ","m":"copy, depict","h":"寫","words":[{"w":"사진","m":"photograph","l":"(copy true)","s":[{"c":"사","t":"ᐤ","g":""},{"c":"진","t":"","g":"true, real (眞)"}]},{"w":"사진관","m":"photo studio","l":"(photograph hall)","s":[{"c":"사","t":"ᐤ","g":""},{"c":"진","t":"","g":""},{"c":"관","t":"","g":""}]},{"w":"사본","m":"Copy of a doc","l":"(copy origin)","s":[{"c":"사","t":"ᐤ","g":""},{"c":"본","t":"","g":""}]},{"w":"복사","m":"photocopy","l":"(duplicate copy)","s":[{"c":"복","t":"","g":"duplicate (複)"},{"c":"사","t":"ᐤ","g":""}]},{"w":"묘사","m":"depiction","l":"(depict copy)","s":[{"c":"묘","t":"","g":"depict, sketch (描)"},{"c":"사","t":"ᐤ","g":""}]},{"w":"필사","m":"handwritten copy","l":"(brush copy)","s":[{"c":"필","t":"","g":"brush, pen (筆)"},{"c":"사","t":"ᐤ","g":""}]}]}],"known":{"words":{},"roots":{}}};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const LS='kr_roots_db_v1';
+let db,cur=0,hist=[],dirty=false,ct,down=false;
+try{const s=localStorage.getItem(LS);if(s)db=JSON.parse(s)}catch(e){}
+if(!db)db=structuredClone(INIT);
+db.known=db.known||{words:{},roots:{}};
+const K=()=>db.known;
+const rk=r=>r.c+r.t;
+const findRoots=c=>db.roots.filter(r=>r.c===c);
+function resolve(s){if(s.t)return db.roots.find(r=>r.c===s.c&&r.t===s.t);const l=findRoots(s.c);return l.length===1?l[0]:null}
+function changed(){dirty=true;try{localStorage.setItem(LS,JSON.stringify(db))}catch(e){}status()}
+function status(){const e=$('#st');e.textContent=dirty?'Unexported changes: press the export icon':'';e.className='st'+(dirty?' d':'')}
+function sylSpan(s,showTag){
+  const ro=resolve(s),k=ro?rk(ro):s.c+(s.t||''),none=s.t?!ro:!findRoots(s.c).length;
+  return `<span class="syl${K().roots[k]?' kn':''}${ro&&ro===db.roots[cur]?' self':''}" data-c="${esc(s.c)}" data-t="${esc(s.t||'')}" data-g="${esc(s.g||'')}" data-k="${esc(k)}" title="${none?'No table yet':''}">${esc(s.c)}${showTag&&s.t?`<sup>${esc(s.t)}</sup>`:''}</span>`}
+function bd(s){const ro=resolve(s);
+  const g=s.g?esc(s.g):(ro&&(ro.m||ro.h)?`<i>${esc(ro.m)}${ro.h?` (${esc(ro.h)})`:''}</i>`:'');
+  return `<span class="bd">${sylSpan(s,true)} <span class="g">${g}</span></span>`}
+const SP=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>`;
+const spBtn=(t,l)=>`<button class="sp" data-say="${esc(t)}" title="Listen: ${esc(l||t)}" aria-label="Listen: ${esc(l||t)}">${SP}</button>`;
+const kBtn=(t,k,txt)=>{const on=!!K()[t][k];return `<button class="kb${on?' on':''}" data-t="${t}" data-k="${esc(k)}" aria-pressed="${on}" title="${on?'Learned (tap to unmark)':'Mark as learned'}">${txt||'✓'}</button>`};
+function row(w,i){return `<tr><td class="wd${K().words[w.w]?' kn':''}" data-w="${esc(w.w)}">${w.s.map(s=>sylSpan(s)).join('')}</td><td>${esc(w.m)}</td><td>${w.s.map(bd).join('')}</td><td class="ac">${kBtn('words',w.w)}${spBtn(w.w)}<button class="ed" data-i="${i}" title="Edit">✎</button></td></tr>`}
+function render(){
+  $('#side').innerHTML=db.roots.map((r,i)=>`<button class="ri${i==cur?' on':''}${K().roots[rk(r)]?' kn':''}" data-i="${i}">${esc(rk(r))} <small>${esc(r.m)}</small></button>`).join('')+'<button class="ri add" id="newroot">+ New root</button>';
+  const r=db.roots[cur];
+  $('#rb').textContent='☰ '+(r?rk(r):'Roots');
+  if(!r){$('#main').innerHTML='<p>No roots yet.</p>';return}
+  $('#main').innerHTML=`<div class="bk">${hist.length&&db.roots[hist[hist.length-1]]?`<button id="back" title="Go back"><span class="ar">←</span> ${esc(rk(db.roots[hist[hist.length-1]]))}</button>`:''}</div>
+  <div class="top"><h2><span data-k="${esc(rk(r))}" class="${K().roots[rk(r)]?'kn':''}">${esc(rk(r))}</span>${r.h?` <span class="mm">(${esc(r.h)})</span>`:''} <span class="mm">${esc(r.m)}</span></h2>${kBtn('roots',rk(r),'✓ Learned')}${spBtn(r.c,rk(r))}<button id="editroot">Edit root</button></div>
+  <div class="scroll"><table><thead><tr><th>Word<th>Meaning<th>Breakdown<th></tr></thead><tbody>${r.words.map(row).join('')}</tbody></table></div><button id="addword">+ Add word</button>`;
+  status()}
+function open(i){if(i!==cur){hist.push(cur);cur=i}render();scrollTo(0,0)}
+function go(el){const c=el.dataset.c,t=el.dataset.t,g=el.dataset.g;
+  if(t){const i=db.roots.findIndex(r=>r.c==c&&r.t==t);return i<0?newRoot(c,t,g):open(i)}
+  const l=db.roots.map((r,i)=>[r,i]).filter(x=>x[0].c==c);
+  if(!l.length)return newRoot(c,'',g);
+  if(l.length==1)return open(l[0][1]);
+  const d=modal(`Which ${esc(c)}?`,l.map(([r,i])=>`<button class="pk" data-i="${i}">${esc(rk(r))} ${esc(r.m)}${r.h?` (${esc(r.h)})`:''}</button>`).join('')+`<button class="pk" data-n="1">+ New root for ${esc(c)}…</button>`,[{label:'Cancel'}]);
+  d.querySelectorAll('.pk').forEach(b=>b.onclick=()=>{d.close();b.dataset.n?newRoot(c,'',g):open(+b.dataset.i)})}
+function showHelp(){
+  const d=modal('How to use KoreanRootsApp',`
+<p>Many Korean words are built from Sino-Korean syllables that keep the same meaning wherever they appear. Each root (like <b>국</b> “country”) has a table of words that use it, and every word is broken down syllable by syllable.</p>
+<h4>Browsing</h4>
+<ul><li>Pick a root from the list on the side (on a phone, tap <b>☰ Roots</b>).</li>
+<li><b>Click any syllable</b> in a word to jump to that syllable’s own root table. Use <b>← Back</b> to return.</li>
+<li>If a syllable has no table yet, you’ll be asked whether to create one.</li></ul>
+<h4>Pronunciation</h4>
+<ul><li>Tap the <b>speaker</b> button next to a word (or next to the root’s title) to hear it read aloud. The sound comes from your device’s Korean voice. If it sounds poor, open <b>Voice settings…</b> below to choose a better voice or change the speed.</li></ul>
+<h4>Searching</h4>
+<ul><li>Use the search box under the title to find a word, root, meaning, or hanja across all roots. Click a result to jump to it (use ↑ ↓ and Enter on a keyboard).</li></ul>
+<h4>Adding and editing</h4>
+<ul><li><b>+ Add word</b>: type the Korean word. A row appears for each syllable where you can set a tag and a meaning (optional; it defaults to the root’s meaning).</li>
+<li><b>Tag</b>: use it to tell apart different roots that share the same syllable (e.g. two different roots both pronounced 사).</li>
+<li><b>✎</b> edits or deletes a word. <b>Edit root</b> changes a root’s meaning and hanja. <b>+ New root</b> adds a new one.</li></ul>
+<h4>Marking what you’ve learned</h4>
+<ul><li>Tap the <b>✓</b> button on a word’s row to mark that word as learned. Tap it again to unmark.</li>
+<li>At the top of a root’s table, tap <b>✓ Learned</b>. A syllable’s root is one click away: click the syllable, then mark it there.</li>
+<li>Learned items are shown <span class="kn">highlighted</span>.</li>
+<li>Shortcut: selecting a syllable or a whole word with the mouse (or press and hold on a phone) also shows a “Learned” box.</li></ul>
+<h4>Saving and moving your data</h4>
+<ul><li>Changes are saved automatically, but <b>only in this browser</b> on this device.</li>
+<li><b>Export</b> (document with an arrow leaving it) downloads a backup file named KRoots.date.json. The header reminds you when you have unexported changes.</li>
+<li><b>Import</b> (document with an arrow entering it) loads such a file, either from your device or from a URL, and <b>replaces</b> what’s currently here. Use Export then Import to move your words to another browser or device.</li></ul>`,[{label:'Voice settings…',fn:()=>{setTimeout(voiceSettings,0)}},{label:'Close'}]);
+  d.classList.add('help')}
+// dialogs
+const f=(id,label,val,ph)=>`<label>${label}<input id="${id}" value="${esc(val)}" placeholder="${esc(ph||'')}"></label>`;
+const v=(d,id)=>d.querySelector('#'+id).value;
+function modal(title,body,btns){
+  const d=document.createElement('dialog');d.innerHTML=`<form method="dialog"><h3>${title}</h3>${body}<div class="btns"></div></form>`;
+  d.querySelector('form').onsubmit=e=>e.preventDefault();
+  btns.forEach(x=>{const e=document.createElement('button');e.type='button';e.textContent=x.label;e.onclick=()=>{if(x.fn&&x.fn(d)===false)return;d.close()};d.querySelector('.btns').append(e)});
+  d.addEventListener('close',()=>d.remove());document.body.append(d);d.showModal();return d}
+// Pull meaning/hanja out of a breakdown gloss like "middle, center (中)"
+function parseGloss(g){g=(g||'').trim();if(!g)return{m:'',h:''};
+  const m=g.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
+  if(m&&/[\u3400-\u9fff\uf900-\ufaff]/.test(m[2]))return{m:m[1].trim(),h:m[2].trim()};
+  if(/^[\u3400-\u9fff\uf900-\ufaff]+$/.test(g))return{m:'',h:g};
+  return{m:g,h:''}}
+// If this syllable has no gloss where it was clicked, look for one in any other word
+function findGloss(c,t,own){if(own)return own;
+  for(const r of db.roots)for(const w of r.words)for(const s of w.s)if(s.c===c&&(s.t||'')===(t||'')&&s.g)return s.g;
+  return''}
+function newRoot(c,t,g){const pre=parseGloss(findGloss(c,t,g));
+  const d=modal(`No table for ${esc(c+t)} yet`,`<div class="row2"><label>Syllable<input id="c" value="${esc(c)}"></label><div class="tg"><span class="tl">Tag <button type="button" class="tgi" aria-label="What is a tag?">?</button></span><input id="t" value="${esc(t)}" maxlength="1" autocomplete="off"></div><div class="tgn" role="tooltip" hidden>Optional, one character. Use it to tell apart different roots that share the same syllable (for example, two different roots both pronounced 사). Give each one a different tag.</div></div>`+f('m','Meaning (optional)',pre.m)+f('h','Hanja (optional)',pre.h),
+  [{label:'Cancel'},{label:'Create table',fn:d=>{const c=v(d,'c').trim(),t=v(d,'t').trim();if(!c)return false;
+    if(db.roots.some(r=>r.c==c&&r.t==t)){alert('A root with this syllable and tag already exists. Add a different tag.');return false}
+    const found=[],seen=new Set();
+    for(const r of db.roots)for(const w of r.words)if(!seen.has(w.w)&&w.s.some(x=>x.c===c&&(x.t||'')===t)){seen.add(w.w);found.push(structuredClone(w))}
+    db.roots.push({c,t,m:v(d,'m').trim(),h:v(d,'h').trim(),words:found});changed();open(db.roots.length-1)}}]);
+  const bt=d.querySelector('.tgi'),nt=d.querySelector('.tgn');let pin=false;
+  const show=x=>{nt.hidden=!x};
+  bt.onmouseenter=()=>show(true);bt.onmouseleave=()=>show(pin);
+  bt.onclick=e=>{e.preventDefault();pin=!pin;show(pin)};
+  d.addEventListener('click',e=>{if(!e.target.closest('.tgi')){pin=false;show(false)}})}
+function editRoot(){const r=db.roots[cur];
+  modal(esc(rk(r)),f('m','Meaning',r.m)+f('h','Hanja',r.h),[{label:'Cancel'},{label:'Save',fn:d=>{r.m=v(d,'m').trim();r.h=v(d,'h').trim();changed();render()}}])}
+function wordForm(i){
+  const r=db.roots[cur],old=i==null?null:r.words[i];let rows=old?old.s.map(s=>({...s})):[];
+  const d=modal(old?esc(old.w):'Add word',f('w','Word (Korean)',old?old.w:'')+f('m','Meaning',old?old.m:'')+'<div class="sub">Breakdown: edit the tag or meaning of each syllable</div><div id="bdx"></div>',
+  [...(old?[{label:'Delete',fn:()=>{if(!confirm('Delete this word?'))return false;r.words.splice(i,1);changed();render()}}]:[]),{label:'Cancel'},
+   {label:'Save',fn:d=>{grab();const w=v(d,'w').trim();if(!w||!rows.length){alert('Enter a Korean word.');return false}
+     const it={w,m:v(d,'m').trim(),l:old?old.l:'',s:rows};old?r.words[i]=it:r.words.push(it);changed();render()}}]);
+  const grab=()=>d.querySelectorAll('.bx').forEach((e,k)=>{if(rows[k]){rows[k].t=e.querySelector('.t').value.trim();rows[k].g=e.querySelector('.g').value.trim()}});
+  const build=()=>{grab();const ch=[...v(d,'w')].filter(x=>/[가-힣]/.test(x));
+    rows=ch.map((c,k)=>rows[k]&&rows[k].c==c?rows[k]:{c,t:c==r.c&&ch.indexOf(c)==k?r.t:'',g:''});
+    d.querySelector('#bdx').innerHTML=rows.map(s=>{const ro=resolve(s);return `<div class="bx"><b>${esc(s.c)}</b><input class="t" placeholder="tag" value="${esc(s.t)}"><input class="g" placeholder="${esc(ro&&ro.m?ro.m:'meaning (hanja)')}" value="${esc(s.g)}"></div>`}).join('')};
+  d.querySelector('#w').oninput=build;build()}
+// "Learned" via text selection
+function target(sel){const rg=sel.getRangeAt(0);
+  const ov=[...$('#main').querySelectorAll('[data-k]')].filter(e=>{const n=document.createRange();n.selectNodeContents(e);if(!(rg.compareBoundaryPoints(Range.START_TO_END,n)>0&&rg.compareBoundaryPoints(Range.END_TO_START,n)<0))return false;
+    const c=rg.cloneRange();if(c.compareBoundaryPoints(Range.START_TO_START,n)<0)c.setStart(n.startContainer,n.startOffset);if(c.compareBoundaryPoints(Range.END_TO_END,n)>0)c.setEnd(n.endContainer,n.endOffset);
+    return c.toString().trim().length>0});
+  if(!ov.length)return null;
+  const e0=ov[0],wd=e0.closest('td.wd');
+  if(wd&&ov.filter(e=>wd.contains(e)).length>1)return{t:'words',k:wd.dataset.w,l:'the word '+wd.dataset.w};
+  return{t:'roots',k:e0.dataset.k,l:'the root '+e0.dataset.k}}
+let tg=null;
+function showTip(){const sel=getSelection();tg=null;
+  if(sel.rangeCount&&!sel.isCollapsed&&sel.toString().trim()&&($('#main').contains(sel.anchorNode)||$('#main').contains(sel.focusNode))&&!document.querySelector('dialog[open]'))tg=target(sel);
+  const tip=$('#tip');if(!tg){tip.style.display='none';return}
+  const rc=sel.getRangeAt(0).getBoundingClientRect();
+  $('#tl').textContent='Learned: '+tg.l;$('#tc').checked=!!K()[tg.t][tg.k];
+  tip.style.display='block';tip.style.top=Math.min(rc.bottom+6,innerHeight-40)+'px';tip.style.left=Math.max(8,Math.min(rc.left,innerWidth-230))+'px'}
+let tm;document.addEventListener('selectionchange',()=>{clearTimeout(tm);tm=setTimeout(()=>{if(!down)showTip()},250)});
+document.addEventListener('mousedown',e=>{if(!e.target.closest('#tip'))down=true});
+document.addEventListener('mouseup',()=>{down=false;setTimeout(showTip,0)});
+$('#tip').addEventListener('mousedown',e=>e.preventDefault());
+$('#tc').onchange=e=>{if(!tg)return;const m=K()[tg.t];e.target.checked?m[tg.k]=1:delete m[tg.k];changed();getSelection().removeAllRanges();$('#tip').style.display='none';render()};
+// clicks
+document.addEventListener('click',e=>{const t=e.target,syl=t.closest('.syl');
+  if(syl&&$('#main').contains(syl)){if(syl.classList.contains('self'))return;if(getSelection().toString().trim())return;clearTimeout(ct);ct=setTimeout(()=>go(syl),220);return}
+  const b=t.closest('button');if(!b||b.closest('dialog'))return;
+  if(b.classList.contains('sp'))speak(b.dataset.say,b);
+  else if(b.classList.contains('kb')){const m=K()[b.dataset.t],k=b.dataset.k,y=scrollY;m[k]?delete m[k]:m[k]=1;changed();render();scrollTo(0,y)}
+  else if(b.classList.contains('ri')&&b.dataset.i!=null){hist=[];cur=+b.dataset.i;document.body.classList.remove('ro');render()}
+  else if(b.id=='rb')document.body.classList.toggle('ro');
+  else if(b.id=='help')showHelp();
+  else if(b.id=='newroot'){document.body.classList.remove('ro');newRoot('','')}
+  else if(b.id=='back'){cur=hist.pop();render()}
+  else if(b.id=='editroot')editRoot();
+  else if(b.id=='addword')wordForm();
+  else if(b.classList.contains('ed'))wordForm(+b.dataset.i)});
+document.addEventListener('dblclick',()=>clearTimeout(ct));
+// pronunciation
+const VK='kr_voice_v1';let vp={v:'',r:1};
+try{Object.assign(vp,JSON.parse(localStorage.getItem(VK)||'{}'))}catch(e){}
+const saveVp=()=>{try{localStorage.setItem(VK,JSON.stringify(vp))}catch(e){}};
+const koVoices=()=>('speechSynthesis' in window?speechSynthesis.getVoices():[]).filter(x=>/^ko([-_]|$)/i.test(x.lang));
+function vScore(x){const n=x.name.toLowerCase();let c=0;
+  if(/natural|neural|online|multilingual/.test(n))c+=6;
+  if(/premium|enhanced|siri/.test(n))c+=5;
+  if(/google/.test(n))c+=4;
+  if(/sunhi|injoon|hyunsu|yuna|sora/.test(n))c+=3;
+  if(/heami/.test(n))c-=2;
+  if(x.localService===false)c+=1;return c}
+function pickVoice(){const l=koVoices();if(!l.length)return null;
+  const mine=vp.v&&l.find(x=>x.name===vp.v);if(mine)return mine;
+  return l.slice().sort((a,b)=>vScore(b)-vScore(a))[0]}
+let warned=false;
+function say(t,btn,force){
+  if(!('speechSynthesis' in window)){alert('Speech is not supported in this browser.');return}
+  const ss=speechSynthesis;ss.cancel();
+  const vs=ss.getVoices(),v=pickVoice();
+  if(vs.length&&!v&&!warned){warned=true;alert('No Korean voice is installed on this device. Add one in your system’s speech/language settings.')}
+  const u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';if(v)u.voice=v;u.rate=vp.r||1;
+  if(btn){btn.classList.add('on');const off=()=>btn.classList.remove('on');u.onend=off;u.onerror=off}
+  ss.speak(u)}
+const speak=say;
+if('speechSynthesis' in window){speechSynthesis.getVoices();speechSynthesis.addEventListener&&speechSynthesis.addEventListener('voiceschanged',()=>{})}
+function voiceSettings(){
+  const l=koVoices().slice().sort((a,b)=>vScore(b)-vScore(a)),auto=pickVoice();
+  const opts='<option value="">Automatic (best available'+(auto&&!vp.v?': '+esc(auto.name):'')+')</option>'+l.map(x=>`<option value="${esc(x.name)}"${x.name===vp.v?' selected':''}>${esc(x.name)}${x.localService===false?' (online)':''}</option>`).join('');
+  const d=modal('Voice settings',(l.length?`<label>Voice<select id="vsel">${opts}</select></label><label>Speed: <span id="vrv">${(vp.r||1).toFixed(2)}</span>×<input id="vr" type="range" min="0.5" max="1.3" step="0.05" value="${vp.r||1}"></label><p class="sub">Voices named “Natural”, “Neural”, “Google”, or “Premium/Enhanced” usually sound best. More voices can be installed in your device’s speech or language settings.</p>`:'<p>No Korean voices were found on this device. Install one in your system’s speech or language settings, then reload this page.</p>'),
+  [{label:'Test',fn:d=>{if(l.length){const sl=d.querySelector('#vsel');vp.v=sl.value;vp.r=+d.querySelector('#vr').value;say('한국, 중국, 미국')}return false}},{label:'Done',fn:d=>{if(l.length){vp.v=d.querySelector('#vsel').value;vp.r=+d.querySelector('#vr').value;saveVp()}}}]);
+  const r=d.querySelector('#vr');if(r)r.oninput=()=>d.querySelector('#vrv').textContent=(+r.value).toFixed(2)}
+// search
+const q=$('#q'),sr=$('#sr');
+const nz=x=>String(x??'').toLowerCase();
+function search(t){t=nz(t).trim();if(!t)return[];const out=[];
+  db.roots.forEach((r,i)=>{
+    const rh=nz([rk(r),r.m,r.h].join(' '));
+    if(rh.includes(t))out.push({k:'root',i,sc:nz(rk(r)).startsWith(t)||nz(r.m).startsWith(t)?0:1});
+    r.words.forEach((w,j)=>{
+      const hs=nz([w.w,w.m,w.l,...w.s.map(s=>s.g)].join(' '));
+      if(hs.includes(t))out.push({k:'word',i,j,sc:nz(w.w).startsWith(t)||nz(w.m).startsWith(t)?0:2})})});
+  return out.sort((a,b)=>a.sc-b.sc).slice(0,40)}
+let sres=[],sel=-1;
+function hideSr(){sr.style.display='none';sel=-1}
+function runSearch(){const t=q.value;if(!t.trim()){hideSr();return}
+  sres=search(t);sel=-1;
+  sr.innerHTML=sres.length?sres.map((x,n)=>{const r=db.roots[x.i];
+    if(x.k=='root')return `<button class="sri" data-n="${n}"><b>${esc(rk(r))}</b><small>${esc(r.m)}${r.h?` (${esc(r.h)})`:''}</small><span class="tg">root</span></button>`;
+    const w=r.words[x.j];
+    return `<button class="sri" data-n="${n}"><b>${esc(w.w)}</b><small>${esc(w.m)}</small><span class="tg">in ${esc(rk(r))}</span></button>`}).join(''):'<div class="sre">No matches</div>';
+  sr.style.display='block'}
+function pick(n){const x=sres[n];if(!x)return;
+  hideSr();q.value='';q.blur();hist=[];cur=x.i;document.body.classList.remove('ro');render();scrollTo(0,0);
+  if(x.k=='word'){const tr=$('#main tbody').children[x.j];if(tr){tr.classList.add('hit');tr.scrollIntoView({block:'center'})}}}
+q.addEventListener('input',runSearch);
+q.addEventListener('focus',()=>{if(q.value.trim())runSearch()});
+q.addEventListener('keydown',e=>{
+  if(e.key=='Escape'){hideSr();q.blur();return}
+  const items=[...sr.querySelectorAll('.sri')];if(!items.length)return;
+  if(e.key=='ArrowDown'||e.key=='ArrowUp'){e.preventDefault();sel=(sel+(e.key=='ArrowDown'?1:-1)+items.length)%items.length;items.forEach((b,k)=>b.classList.toggle('on',k==sel));items[sel].scrollIntoView({block:'nearest'})}
+  else if(e.key=='Enter'){e.preventDefault();pick(sel>=0?sel:0)}});
+sr.addEventListener('mousedown',e=>e.preventDefault());
+sr.addEventListener('click',e=>{const b=e.target.closest('.sri');if(b)pick(+b.dataset.n)});
+document.addEventListener('click',e=>{if(!e.target.closest('#sw'))hideSr()});
+// export / import
+let fh=null;
+const fnEl={value:'KRoots.'+new Date().toLocaleDateString('sv')};const base=n=>n.replace(/\.json$/i,'');
+const fname=()=>(base(fnEl.value.trim()).replace(/[\\\/:*?"<>|]/g,'')||'KRoots')+'.json';
+const FT=[{description:'JSON',accept:{'application/json':['.json']}}];
+function loadText(t){try{const d=JSON.parse(t);if(!Array.isArray(d.roots))throw 0;
+  db=d;db.known=db.known||{words:{},roots:{}};cur=0;hist=[];changed();dirty=false;render()}catch(x){alert('That file is not a valid roots database.')}}
+$('#save').onclick=async()=>{const txt=JSON.stringify(db,null,1),name=fname();
+  if(window.showSaveFilePicker){try{if(fh&&fh.name!==name)fh=null;if(!fh){fh=await showSaveFilePicker({suggestedName:name,types:FT});fnEl.value=base(fh.name)}
+    const w=await fh.createWritable();await w.write(txt);await w.close();dirty=false;status();return}
+  catch(e){if(e.name=='AbortError')return;fh=null}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.download=name;a.click();dirty=false;status()};
+async function pickFile(){
+  if(window.showOpenFilePicker){try{const [h]=await showOpenFilePicker({types:FT});const t=await (await h.getFile()).text();fh=h;fnEl.value=base(h.name);loadText(t)}catch(e){}return}
+  $('#file').click()}
+const rawUrl=u=>{u=u.trim();const m=u.match(/^https?:\/\/github\.com\/([^/]+)\/([^/]+)\/blob\/(.+)$/);return m?`https://raw.githubusercontent.com/${m[1]}/${m[2]}/${m[3]}`:u};
+$('#load').onclick=()=>{
+  const d=modal('Import','<label>From a URL<input id="u" type="url" placeholder="https://example.com/KRoots.json" autocomplete="off" spellcheck="false"></label><div class="sub" id="ue"></div><p class="sub">Importing replaces the words currently in this browser.</p>',
+  [{label:'Cancel'},{label:'Choose file…',fn:()=>{pickFile()}},{label:'Load URL',fn:d=>{
+    const u=rawUrl(v(d,'u')),er=d.querySelector('#ue');er.style.color='';
+    if(!/^https?:\/\//i.test(u)){er.style.color='var(--no)';er.textContent='Enter a full URL starting with https://';return false}
+    er.textContent='Loading…';
+    fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(t=>{d.close();loadText(t)})
+    .catch(e=>{er.style.color='var(--no)';er.textContent="Couldn't load that URL ("+e.message+"). The link must point directly to the JSON file, and the host must allow cross-site access (CORS). GitHub raw links work; many file-sharing links don't."});
+    return false}}]);
+  d.querySelector('#u').addEventListener('keydown',e=>{if(e.key=='Enter')d.querySelectorAll('.btns button')[2].click()});
+  d.querySelector('#u').focus()};
+$('#file').onchange=e=>{const fl=e.target.files[0];if(!fl)return;fh=null;fnEl.value=base(fl.name);const rd=new FileReader();rd.onload=()=>loadText(rd.result);rd.readAsText(fl);e.target.value=''};
+onbeforeunload=e=>{if(dirty){e.preventDefault();e.returnValue=''}};
+render();
+</script>
+</body>
+</html>
