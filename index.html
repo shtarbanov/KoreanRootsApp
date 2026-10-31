@@ -73,6 +73,7 @@ dialog select{display:block;width:100%;font:inherit;font-size:16px;padding:6px;m
 .tgi{width:18px;height:18px;padding:0;border-radius:50%;font-size:12px;line-height:16px;font-weight:700;color:var(--mut)}
 .tgn{position:absolute;left:0;right:0;top:100%;margin-top:6px;z-index:5;font-size:13px;line-height:1.4;padding:8px 10px;background:var(--fg);color:var(--bg);border-radius:6px;box-shadow:0 2px 8px #0006}
 .tgn[hidden]{display:none}
+h4.sec{margin:0 0 2px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)}
 dialog::backdrop{background:#0006}
 dialog h3{margin:0 0 8px}dialog label{display:block;font-size:13px;color:var(--mut);margin-top:8px}
 dialog input{display:block;width:100%;font:inherit;padding:4px 6px;margin-top:2px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:5px}
@@ -105,7 +106,7 @@ body{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 </head>
 <body>
 <header><h1>KoreanRootsApp</h1><span class="st" id="st"></span>
-<button id="rb">☰ Roots</button><button id="load" class="ic" title="Import JSON" aria-label="Import JSON"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M2 15h10"/><path d="m9 18 3-3-3-3"/></svg></button><button id="save" class="ic" title="Export JSON" aria-label="Export JSON"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M2 15h10"/><path d="m5 12-3 3 3 3"/></svg></button><button id="help" title="How to use" aria-label="How to use">?</button><input type="file" id="file" accept=".json,application/json" hidden></header>
+<button id="rb">☰ Roots</button><button id="load" class="ic" title="Import JSON" aria-label="Import JSON"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M2 15h10"/><path d="m9 18 3-3-3-3"/></svg></button><button id="save" class="ic" title="Export JSON" aria-label="Export JSON"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M2 15h10"/><path d="m5 12-3 3 3 3"/></svg></button><button id="settings" class="ic" title="Settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button><button id="help" title="How to use" aria-label="How to use">?</button><input type="file" id="file" accept=".json,application/json" hidden></header>
 <div id="sw"><input id="q" type="search" placeholder="Search words, roots, meanings…" aria-label="Search" autocomplete="off" spellcheck="false"><div id="sr" role="listbox"></div></div>
 <div class="wrap"><aside id="side"></aside><main id="main"></main></div>
 <footer>Created by Ali Shtarbanov</footer>
@@ -160,7 +161,7 @@ function showHelp(){
 <li><b>Click any syllable</b> in a word to jump to that syllable’s own root table. Use <b>← Back</b> to return.</li>
 <li>If a syllable has no table yet, you’ll be asked whether to create one.</li></ul>
 <h4>Pronunciation</h4>
-<ul><li>Tap the <b>speaker</b> button next to a word (or next to the root’s title) to hear it read aloud. The sound comes from your device’s Korean voice. If it sounds poor, open <b>Voice settings…</b> below to choose a better voice or change the speed.</li></ul>
+<ul><li>Tap the <b>speaker</b> button next to a word (or next to the root’s title) to hear it read aloud. The sound comes from your device’s Korean voice. If it sounds poor, open <b>Settings</b> (the gear icon) to choose a better voice or change the speed.</li></ul>
 <h4>Searching</h4>
 <ul><li>Use the search box under the title to find a word, root, meaning, or hanja across all roots. Click a result to jump to it (use ↑ ↓ and Enter on a keyboard).</li></ul>
 <h4>Adding and editing</h4>
@@ -175,7 +176,7 @@ function showHelp(){
 <h4>Saving and moving your data</h4>
 <ul><li>Changes are saved automatically, but <b>only in this browser</b> on this device.</li>
 <li><b>Export</b> (document with an arrow leaving it) downloads a backup file named KRoots.date.json. The header reminds you when you have unexported changes.</li>
-<li><b>Import</b> (document with an arrow entering it) loads such a file, either from your device or from a URL, and <b>replaces</b> what’s currently here. Use Export then Import to move your words to another browser or device.</li></ul>`,[{label:'Voice settings…',fn:()=>{setTimeout(voiceSettings,0)}},{label:'Close'}]);
+<li><b>Import</b> (document with an arrow entering it) loads such a file, either from your device or from a URL, and <b>replaces</b> what’s currently here. Use Export then Import to move your words to another browser or device.</li></ul>`,[{label:'Close'}]);
   d.classList.add('help')}
 // dialogs
 const f=(id,label,val,ph)=>`<label>${label}<input id="${id}" value="${esc(val)}" placeholder="${esc(ph||'')}"></label>`;
@@ -250,6 +251,7 @@ document.addEventListener('click',e=>{const t=e.target,syl=t.closest('.syl');
   else if(b.classList.contains('ri')&&b.dataset.i!=null){hist=[];cur=+b.dataset.i;document.body.classList.remove('ro');render()}
   else if(b.id=='rb')document.body.classList.toggle('ro');
   else if(b.id=='help')showHelp();
+  else if(b.id=='settings')voiceSettings();
   else if(b.id=='newroot'){document.body.classList.remove('ro');newRoot('','')}
   else if(b.id=='back'){cur=hist.pop();render()}
   else if(b.id=='editroot')editRoot();
@@ -285,7 +287,7 @@ if('speechSynthesis' in window){speechSynthesis.getVoices();speechSynthesis.addE
 function voiceSettings(){
   const l=koVoices().slice().sort((a,b)=>vScore(b)-vScore(a)),auto=pickVoice();
   const opts='<option value="">Automatic (best available'+(auto&&!vp.v?': '+esc(auto.name):'')+')</option>'+l.map(x=>`<option value="${esc(x.name)}"${x.name===vp.v?' selected':''}>${esc(x.name)}${x.localService===false?' (online)':''}</option>`).join('');
-  const d=modal('Voice settings',(l.length?`<label>Voice<select id="vsel">${opts}</select></label><label>Speed: <span id="vrv">${(vp.r||1).toFixed(2)}</span>×<input id="vr" type="range" min="0.5" max="1.3" step="0.05" value="${vp.r||1}"></label><p class="sub">Voices named “Natural”, “Neural”, “Google”, or “Premium/Enhanced” usually sound best. More voices can be installed in your device’s speech or language settings.</p>`:'<p>No Korean voices were found on this device. Install one in your system’s speech or language settings, then reload this page.</p>'),
+  const d=modal('Settings','<h4 class="sec">Voice</h4>'+(l.length?`<label>Voice<select id="vsel">${opts}</select></label><label>Speed: <span id="vrv">${(vp.r||1).toFixed(2)}</span>×<input id="vr" type="range" min="0.5" max="1.3" step="0.05" value="${vp.r||1}"></label><p class="sub">Voices named “Natural”, “Neural”, “Google”, or “Premium/Enhanced” usually sound best. More voices can be installed in your device’s speech or language settings.</p>`:'<p>No Korean voices were found on this device. Install one in your system’s speech or language settings, then reload this page.</p>'),
   [{label:'Test',fn:d=>{if(l.length){const sl=d.querySelector('#vsel');vp.v=sl.value;vp.r=+d.querySelector('#vr').value;say('한국, 중국, 미국')}return false}},{label:'Done',fn:d=>{if(l.length){vp.v=d.querySelector('#vsel').value;vp.r=+d.querySelector('#vr').value;saveVp()}}}]);
   const r=d.querySelector('#vr');if(r)r.oninput=()=>d.querySelector('#vrv').textContent=(+r.value).toFixed(2)}
 // search
