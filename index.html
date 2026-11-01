@@ -63,7 +63,9 @@ tr.hit>td{animation:hit 2.2s ease-out}
 .sp{display:inline-flex;align-items:center;padding:3px 7px;margin-right:4px;color:var(--acc)}
 .sp.on{background:var(--kn)}
 .ac{white-space:nowrap}
-.hid{text-decoration:line-through;opacity:.55}td.tb{color:var(--mut)}
+.hid{text-decoration:line-through;opacity:.55}
+.mf{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}.mf input,.mf select{font:inherit;padding:6px 10px;background:var(--inp);color:var(--fg);border:1px solid var(--bd);border-radius:6px;min-width:0}.mf input{flex:1;min-width:160px}
+@media (max-width:700px){.mf input,.mf select{font-size:16px}.mf select{flex:1}}td.tb{color:var(--mut)}
 dialog select{display:block;width:100%;font:inherit;font-size:16px;padding:6px;margin-top:2px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:5px}
 .kb{display:inline-flex;align-items:center;padding:3px 8px;margin-right:4px;color:var(--mut)}
 .kb.on{background:var(--kn);border-color:var(--knfg);color:var(--knfg)}
@@ -111,7 +113,7 @@ body{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 <body>
 <header><h1>KoreanRootsApp</h1><span class="st" id="st"></span>
 <button id="rb">☰ Roots</button><button id="load" class="ic" title="Import JSON" aria-label="Import JSON"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M2 15h10"/><path d="m9 18 3-3-3-3"/></svg></button><button id="save" class="ic" title="Export JSON" aria-label="Export JSON"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M2 15h10"/><path d="m5 12-3 3 3 3"/></svg></button><button id="settings" class="ic" title="Settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button><button id="help" title="How to use" aria-label="How to use">?</button><input type="file" id="file" accept=".json,application/json" hidden></header>
-<div id="sw"><input id="q" type="search" placeholder="Search words, roots, meanings…" aria-label="Search" autocomplete="off" spellcheck="false"><div id="sr" role="listbox"></div></div>
+<div id="sw"><input id="q" type="search" placeholder="Search words, roots, meanings, romanization…" aria-label="Search" autocomplete="off" spellcheck="false"><div id="sr" role="listbox"></div></div>
 <div class="wrap"><aside id="side"></aside><main id="main"></main></div>
 <footer>Created by Ali Shtarbanov</footer>
 <script>
@@ -121,7 +123,7 @@ const TK='kr_theme_v1';let theme='system';try{theme=localStorage.getItem(TK)||'s
 function setTheme(t){theme=t;const r=document.documentElement;t==='light'||t==='dark'?r.dataset.theme=t:delete r.dataset.theme;try{localStorage.setItem(TK,t)}catch(e){}}
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const LS='kr_roots_db_v1';
-let db,cur=0,hist=[],dirty=false,ct,master=false;
+let db,cur=0,hist=[],dirty=false,ct,master=false,mf={q:'',s:'all',t:''};
 try{const s=localStorage.getItem(LS);if(s)db=JSON.parse(s)}catch(e){}
 if(!db)db=structuredClone(INIT);
 // Older data kept a copy of each word inside every root. Merge them into one global list db.words.
@@ -161,12 +163,27 @@ function render(){
   $('#side').innerHTML=`<button class="ri${master?' on':''}" id="allwords">All words <small>${db.words.length}</small></button>`+db.roots.map((r,i)=>`<button class="ri${!master&&i==cur?' on':''}${K().roots[rk(r)]?' kn':''}" data-i="${i}">${esc(rk(r))} <small>${esc(r.m)}</small></button>`).join('')+'<button class="ri add" id="newroot">+ New root</button>';
   const r=db.roots[cur];
   $('#rb').textContent='☰ '+(master?'All words':r?rk(r):'Roots');
-  if(master){$('#main').innerHTML=`<div class="bk"></div><div class="top"><h2>All words <span class="mm">${db.words.length}</span></h2></div><div class="scroll"><table><thead><tr><th>Word<th>Meaning<th>Breakdown<th>Tables<th></tr></thead><tbody>${db.words.map(w=>row(w,true)).join('')}</tbody></table></div>`;status();return}
+  if(master){$('#main').innerHTML=`<div class="bk"></div><div class="top"><h2>All words <span class="mm" id="mcount"></span></h2></div><div class="mf"><input id="mq" type="search" placeholder="Filter words…" aria-label="Filter words" autocomplete="off" spellcheck="false" value="${esc(mf.q)}"><select id="ms" aria-label="Show">${[['all','All words'],['hidden','Removed from a table'],['orphan','Not in any table'],['learned','Learned'],['unlearned','Not learned']].map(([k,n])=>`<option value="${k}"${mf.s===k?' selected':''}>${n}</option>`).join('')}</select><select id="mt" aria-label="Table"><option value="">Any table</option>${db.roots.map(r=>`<option value="${esc(rk(r))}"${mf.t===rk(r)?' selected':''}>${esc(rk(r))} ${esc(r.m)}</option>`).join('')}</select></div><div class="scroll"><table><thead><tr><th>Word<th>Meaning<th>Breakdown<th>Tables<th></tr></thead><tbody id="mtb"></tbody></table></div>`;fillMaster();status();return}
   if(!r){$('#main').innerHTML='<p>No roots yet.</p>';return}
   $('#main').innerHTML=`<div class="bk">${hist.length&&db.roots[hist[hist.length-1]]?`<button id="back" title="Go back"><span class="ar">←</span> ${esc(rk(db.roots[hist[hist.length-1]]))}</button>`:''}</div>
   <div class="top"><h2><span data-k="${esc(rk(r))}" class="${K().roots[rk(r)]?'kn':''}">${esc(rk(r))}</span>${r.h?` <span class="mm">(${esc(r.h)})</span>`:''} <span class="mm">${esc(r.m)}</span></h2>${kBtn('roots',rk(r),'✓ Learned')}${spBtn(r.c,rk(r))}<button id="editroot">Edit root</button></div>
   <div class="scroll"><table><thead><tr><th>Word<th>Meaning<th>Breakdown<th></tr></thead><tbody>${rootWords(r).map(w=>row(w)).join('')}</tbody></table></div><button id="addword">+ Add word</button>`;
   status()}
+function mFilter(w){
+  if(mf.t){const r=db.roots.find(r=>rk(r)===mf.t);if(r&&!inRoot(w,r))return false}
+  const st=mf.s;
+  if(st==='hidden'&&!db.roots.some(r=>inRoot(w,r)&&(w.x||[]).includes(rk(r))))return false;
+  if(st==='orphan'&&db.roots.some(r=>shown(w,r)))return false;
+  if(st==='learned'&&!K().words[w.w])return false;
+  if(st==='unlearned'&&K().words[w.w])return false;
+  const t=nz(mf.q).trim();if(!t)return true;
+  if(nz([w.w,w.m,w.l,...w.s.map(s=>s.g)].join(' ')).includes(t))return true;
+  return /^[a-z][a-z\s'’\-]*$/.test(t)&&loose(roman(w.w)).includes(loose(t))}
+function fillMaster(){const l=db.words.filter(mFilter);
+  $('#mtb').innerHTML=l.length?l.map(w=>row(w,true)).join(''):'<tr><td colspan="5" class="sre">No words match these filters.</td></tr>';
+  $('#mcount').textContent=l.length==db.words.length?db.words.length:l.length+' of '+db.words.length}
+document.addEventListener('input',e=>{if(e.target.id==='mq'){mf.q=e.target.value;fillMaster()}});
+document.addEventListener('change',e=>{const t=e.target;if(t.id==='ms'){mf.s=t.value;fillMaster()}else if(t.id==='mt'){mf.t=t.value;fillMaster()}});
 function open(i){master=false;if(i!==cur){hist.push(cur);cur=i}render();scrollTo(0,0)}
 function go(el){const c=el.dataset.c,t=el.dataset.t,g=el.dataset.g;
   if(t){const i=db.roots.findIndex(r=>r.c==c&&r.t==t);return i<0?newRoot(c,t,g):open(i)}
@@ -180,13 +197,13 @@ function showHelp(){
 <p>Many Korean words are built from Sino-Korean syllables that keep the same meaning wherever they appear. Each root (like <b>국</b> “country”) has a table of words that use it, and every word is broken down syllable by syllable.</p>
 <h4>Browsing</h4>
 <ul><li>Pick a root from the list on the side (on a phone, tap <b>☰ Roots</b>).</li>
-<li>Choose <b>All words</b> at the top of that list to see the whole shared word list and which tables show each word. A crossed-out table means the word was removed from it.</li>
+<li>Choose <b>All words</b> at the top of that list to see the whole shared word list and which tables show each word. A crossed-out table means the word was removed from it. Use the filters at the top to narrow the list by text, by table, or by status (removed from a table, not in any table, learned).</li>
 <li><b>Click any syllable</b> in a word to jump to that syllable’s own root table. Use <b>← Back</b> to return.</li>
 <li>If a syllable has no table yet, you’ll be asked whether to create one.</li></ul>
 <h4>Pronunciation</h4>
 <ul><li>Tap the <b>speaker</b> button next to a word (or next to the root’s title) to hear it read aloud. The sound comes from your device’s Korean voice. If it sounds poor, open <b>Settings</b> (the gear icon) to choose a better voice or change the speed. Settings also lets you switch between light and dark themes.</li></ul>
 <h4>Searching</h4>
-<ul><li>Use the search box under the title to find a word, root, meaning, or hanja across all roots. Click a result to jump to it (use ↑ ↓ and Enter on a keyboard).</li></ul>
+<ul><li>Use the search box under the title to find a word, root, meaning, hanja, or romanization (for example “hakgyo” finds 학교) across all roots. Click a result to jump to it (use ↑ ↓ and Enter on a keyboard).</li></ul>
 <h4>Adding and editing</h4>
 <ul><li>All words live in one shared list. Each table shows every word that contains that root’s syllable, so editing a word changes it everywhere. <b>Remove from table</b> (in a word’s edit dialog) only hides it from the current table; add the same word again there to bring it back.</li><li><b>+ Add word</b>: type the Korean word. A row appears for each syllable where you can set a tag and a meaning (optional; it defaults to the root’s meaning).</li>
 <li><b>Tag</b>: use it to tell apart different roots that share the same syllable (e.g. two different roots both pronounced 사).</li>
@@ -301,23 +318,31 @@ function voiceSettings(){
 // search
 const q=$('#q'),sr=$('#sr');
 const nz=x=>String(x??'').toLowerCase();
+// Revised Romanization, syllable by syllable (no sound-change rules), used for search
+const RI=['g','kk','n','d','tt','r','m','b','pp','s','ss','','j','jj','ch','k','t','p','h'];
+const RV=['a','ae','ya','yae','eo','e','yeo','ye','o','wa','wae','oe','yo','u','wo','we','wi','yu','eu','ui','i'];
+const RF=['','k','k','k','n','n','n','t','l','k','m','l','l','l','p','l','m','p','p','t','t','ng','t','t','k','t','p','t'];
+const roman=x=>[...String(x??'')].map(c=>{const n=c.charCodeAt(0)-0xAC00;if(n<0||n>11171)return c.toLowerCase();const f=n%28,v=Math.floor(n/28)%21,i=Math.floor(n/588);return RI[i]+RV[v]+RF[f]}).join('');
+// Fold look-alike letters so "kuk", "guk" and "gug" all match (g/k, d/t, b/p, l/r, ch/j)
+const loose=x=>x.toLowerCase().replace(/[\s'’.\-]/g,'').replace(/ch/g,'j').replace(/[gdbl]/g,c=>({g:'k',d:'t',b:'p',l:'r'}[c]));
 function search(t){t=nz(t).trim();if(!t)return[];const out=[];
+  const lat=/^[a-z][a-z\s'’\-]*$/.test(t),q2=lat?loose(t):'';
+  const rmatch=x=>{if(!lat)return 0;const r=loose(roman(x));return r.startsWith(q2)?2:r.includes(q2)?1:0};
   db.roots.forEach((r,i)=>{
-    const rh=nz([rk(r),r.m,r.h].join(' '));
-    if(rh.includes(t))out.push({k:'root',i,sc:nz(rk(r)).startsWith(t)||nz(r.m).startsWith(t)?0:1});
-    });
+    const rh=nz([rk(r),r.m,r.h].join(' ')),rm=rmatch(r.c);
+    if(rh.includes(t)||rm)out.push({k:'root',i,sc:nz(rk(r)).startsWith(t)||nz(r.m).startsWith(t)||rm==2?0:1})});
   db.words.forEach((w,j)=>{const i=db.roots.findIndex(r=>shown(w,r));if(i<0)return;
-    const hs=nz([w.w,w.m,w.l,...w.s.map(s=>s.g)].join(' '));
-    if(hs.includes(t))out.push({k:'word',i,j,sc:nz(w.w).startsWith(t)||nz(w.m).startsWith(t)?0:2})});
+    const hs=nz([w.w,w.m,w.l,...w.s.map(s=>s.g)].join(' ')),rm=rmatch(w.w);
+    if(hs.includes(t)||rm)out.push({k:'word',i,j,sc:nz(w.w).startsWith(t)||nz(w.m).startsWith(t)||rm==2?0:2})});
   return out.sort((a,b)=>a.sc-b.sc).slice(0,40)}
 let sres=[],sel=-1;
 function hideSr(){sr.style.display='none';sel=-1}
 function runSearch(){const t=q.value;if(!t.trim()){hideSr();return}
   sres=search(t);sel=-1;
   sr.innerHTML=sres.length?sres.map((x,n)=>{const r=db.roots[x.i];
-    if(x.k=='root')return `<button class="sri" data-n="${n}"><b>${esc(rk(r))}</b><small>${esc(r.m)}${r.h?` (${esc(r.h)})`:''}</small><span class="tg">root</span></button>`;
+    if(x.k=='root')return `<button class="sri" data-n="${n}"><b>${esc(rk(r))}</b><small>${esc(roman(r.c))}</small><small>${esc(r.m)}${r.h?` (${esc(r.h)})`:''}</small><span class="tg">root</span></button>`;
     const w=db.words[x.j];
-    return `<button class="sri" data-n="${n}"><b>${esc(w.w)}</b><small>${esc(w.m)}</small><span class="tg">in ${esc(rk(r))}</span></button>`}).join(''):'<div class="sre">No matches</div>';
+    return `<button class="sri" data-n="${n}"><b>${esc(w.w)}</b><small>${esc(roman(w.w))}</small><small>${esc(w.m)}</small><span class="tg">in ${esc(rk(r))}</span></button>`}).join(''):'<div class="sre">No matches</div>';
   sr.style.display='block'}
 function pick(n){const x=sres[n];if(!x)return;
   hideSr();q.value='';q.blur();master=false;hist=[];cur=x.i;document.body.classList.remove('ro');render();scrollTo(0,0);
@@ -354,7 +379,7 @@ function loadText(t,mode){let d;const T='Can’t import this file';
   try{if(!d.roots.every(r=>r&&typeof r.c==='string'))throw 0;migrate(d)}catch(e){return note(T,'Some roots or words in it are malformed, so it couldn’t be read. Nothing was changed.')}
   if(mode==='merge'){const r=mergeIn(d);if(cur>=db.roots.length)cur=0;hist=[];changed();render();
     modal('Merge complete',`<p>Added ${r.nr} new root${r.nr==1?'':'s'} and ${r.nw} new word${r.nw==1?'':'s'}. ${r.kw} word${r.kw==1?' was':'s were'} already here and kept as ${r.kw==1?'it is':'they are'}.</p>`,[{label:'Close'}])}
-  else{db=d;master=false;cur=0;hist=[];changed();dirty=false;render()}}
+  else{db=d;master=false;mf={q:'',s:'all',t:''};cur=0;hist=[];changed();dirty=false;render()}}
 $('#save').onclick=async()=>{const txt=JSON.stringify(db,null,1),name=fname();
   if(window.showSaveFilePicker){try{if(fh&&fh.name!==name)fh=null;if(!fh){fh=await showSaveFilePicker({suggestedName:name,types:FT});fnEl.value=base(fh.name)}
     const w=await fh.createWritable();await w.write(txt);await w.close();dirty=false;status();return}
@@ -372,9 +397,12 @@ $('#load').onclick=()=>{
     er.textContent='Loading…';
     fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(t=>{d.close();loadText(t,mode)})
     .catch(e=>{er.style.color='var(--no)';er.textContent="Couldn't load that URL ("+e.message+"). The link must point directly to the JSON file, and the host must allow cross-site access (CORS). GitHub raw links work; many file-sharing links don't."})};
-  const d=modal('Import from JSON','<div class="sub" style="margin-top:0">Import mode</div><label class="opt" title="Use the imported data instead of what is here"><input type="radio" name="im" value="replace" checked>Replace</label><label class="opt" title="Add new roots and words from the file, and keep what is here"><input type="radio" name="im" value="merge">Merge</label><div class="sub">Source</div><div class="seg" role="group" aria-label="Import source"><button type="button" id="sf" class="on" aria-pressed="true">File</button><button type="button" id="su" aria-pressed="false">URL</button></div><div class="panes"><div class="drop" id="pfile" tabindex="0" role="button">Drop a .json file here or click to browse</div><div class="pane" id="purl" hidden><div class="urow"><input id="u" type="url" placeholder="https://example.com/KRoots.json" autocomplete="off" spellcheck="false" aria-label="JSON file URL"><button type="button" id="lu">Load URL</button></div><div class="sub" id="ue"></div></div></div>',
+  const d=modal('Import from JSON','<div class="sub" style="margin-top:0;position:relative;display:flex;align-items:center;gap:6px">Import mode <button type="button" class="tgi" aria-label="What do Replace and Merge do?" aria-expanded="false">?</button><div class="tgn" role="tooltip" hidden><b>Replace</b>: use the imported data instead of what is here.<br><b>Merge</b>: add new roots and words from the file, and keep what is here.</div></div><label class="opt" title="Use the imported data instead of what is here"><input type="radio" name="im" value="replace" checked>Replace</label><label class="opt" title="Add new roots and words from the file, and keep what is here"><input type="radio" name="im" value="merge">Merge</label><div class="sub">Source</div><div class="seg" role="group" aria-label="Import source"><button type="button" id="sf" class="on" aria-pressed="true">File</button><button type="button" id="su" aria-pressed="false">URL</button></div><div class="panes"><div class="drop" id="pfile" tabindex="0" role="button">Drop a .json file here or click to browse</div><div class="pane" id="purl" hidden><div class="urow"><input id="u" type="url" placeholder="https://example.com/KRoots.json" autocomplete="off" spellcheck="false" aria-label="JSON file URL"><button type="button" id="lu">Load URL</button></div><div class="sub" id="ue"></div></div></div>',
   [{label:'Cancel'}]);
-  d.classList.add('imp');d.querySelector('#lu').onclick=()=>go(d);
+  d.classList.add('imp');
+  {const bt=d.querySelector('.tgi'),nt=d.querySelector('.tgn');let pin=false;const show=x=>{nt.hidden=!x;bt.setAttribute('aria-expanded',x)};
+   bt.onmouseenter=()=>show(true);bt.onmouseleave=()=>show(pin);bt.onclick=e=>{e.preventDefault();pin=!pin;show(pin)};
+   d.addEventListener('click',e=>{if(!e.target.closest('.tgi')){pin=false;show(false)}})}d.querySelector('#lu').onclick=()=>go(d);
   const pick=k=>{[['sf','file'],['su','url']].forEach(([id,n])=>{const b=d.querySelector('#'+id);b.classList.toggle('on',n===k);b.setAttribute('aria-pressed',n===k)});
     d.querySelector('#pfile').hidden=k!=='file';d.querySelector('#purl').hidden=k!=='url';if(k==='url')d.querySelector('#u').focus()};
   d.querySelector('#sf').onclick=()=>pick('file');d.querySelector('#su').onclick=()=>pick('url');
