@@ -150,7 +150,6 @@ function normTags(d){const isSup=t=>t.length===1&&SUPD.includes(t),map=new Map()
   for(const r of d.roots){const m=map.get(r.c+(r.t||''));if(m)r.t=m.nt}
   return [...map].map(([k,m])=>[k,m.c+m.nt])}
 //TAGFIX-END
-const tagNote=()=>tagFix.length?`All tags are now superscript numbers (for example ${tagFix.slice(0,2).map(([a,b])=>esc(a)+' is now '+esc(b)).join(' and ')}). Words, removed-from-table entries and learned marks were updated to match.`:'';
 function migrate(d){d.known=d.known||{words:{},roots:{}};
   if(!Array.isArray(d.words)){const m=new Map();d.words=[];
     for(const r of d.roots){for(const w of r.words||[]){const e=m.get(w.w);
@@ -432,8 +431,8 @@ function loadText(t,mode){let d;const T='Can’t import this file';
   if(!d||!Array.isArray(d.roots))return note(T,'It has no “roots” list, so it doesn’t look like a KoreanRootsApp export. Choose a file saved with the Export button.');
   try{if(!d.roots.every(r=>r&&typeof r.c==='string'))throw 0;migrate(d)}catch(e){return note(T,'Some roots or words in it are malformed, so it couldn’t be read. Nothing was changed.')}
   if(mode==='merge'){const r=mergeIn(d);if(cur>=db.roots.length)cur=0;hist=[];changed();render();
-    modal('Merge complete',`<p>Added ${r.nr} new root${r.nr==1?'':'s'} and ${r.nw} new word${r.nw==1?'':'s'}. ${r.kw} word${r.kw==1?' was':'s were'} already here and kept as ${r.kw==1?'it is':'they are'}.${tagFix.length?' '+tagNote():''}</p>`,[{label:'Close'}])}
-  else{db=d;master=false;mf={q:'',s:'all',t:''};cur=0;hist=[];changed();dirty=false;render();if(tagFix.length)note('Tags updated',tagNote())}}
+    modal('Merge complete',`<p>Added ${r.nr} new root${r.nr==1?'':'s'} and ${r.nw} new word${r.nw==1?'':'s'}. ${r.kw} word${r.kw==1?' was':'s were'} already here and kept as ${r.kw==1?'it is':'they are'}.</p>`,[{label:'Close'}])}
+  else{db=d;master=false;mf={q:'',s:'all',t:''};cur=0;hist=[];changed();dirty=false;render()}}
 $('#save').onclick=async()=>{const txt=JSON.stringify(db,null,1),name=fname();
   if(window.showSaveFilePicker){try{if(fh&&fh.name!==name)fh=null;if(!fh){fh=await showSaveFilePicker({suggestedName:name,types:FT});fnEl.value=base(fh.name)}
     const w=await fh.createWritable();await w.write(txt);await w.close();dirty=false;status();return}
@@ -469,7 +468,7 @@ $('#load').onclick=()=>{
 $('#file').onchange=e=>{const fl=e.target.files[0];if(!fl)return;fh=null;if(impMode==='replace')fnEl.value=base(fl.name);const rd=new FileReader();rd.onload=()=>loadText(rd.result,impMode);rd.readAsText(fl);e.target.value=''};
 onbeforeunload=e=>{if(dirty){e.preventDefault();e.returnValue=''}};
 render();
-if(tagFix.length){changed();note('Tags updated',tagNote()+' Export a new backup when you can, so your saved file matches.')}
+if(tagFix.length)try{localStorage.setItem(LS,JSON.stringify(db))}catch(e){}
 </script>
 </body>
 </html>
