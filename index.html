@@ -63,6 +63,7 @@ tr.hit>td{animation:hit 2.2s ease-out}
 .sp{display:inline-flex;align-items:center;padding:3px 7px;margin-right:4px;color:var(--acc)}
 .sp.on{background:var(--kn)}
 .ac{white-space:nowrap}
+.hid{text-decoration:line-through;opacity:.55}td.tb{color:var(--mut)}
 dialog select{display:block;width:100%;font:inherit;font-size:16px;padding:6px;margin-top:2px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:5px}
 .kb{display:inline-flex;align-items:center;padding:3px 8px;margin-right:4px;color:var(--mut)}
 .kb.on{background:var(--kn);border-color:var(--knfg);color:var(--knfg)}
@@ -120,7 +121,7 @@ const TK='kr_theme_v1';let theme='system';try{theme=localStorage.getItem(TK)||'s
 function setTheme(t){theme=t;const r=document.documentElement;t==='light'||t==='dark'?r.dataset.theme=t:delete r.dataset.theme;try{localStorage.setItem(TK,t)}catch(e){}}
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const LS='kr_roots_db_v1';
-let db,cur=0,hist=[],dirty=false,ct;
+let db,cur=0,hist=[],dirty=false,ct,master=false;
 try{const s=localStorage.getItem(LS);if(s)db=JSON.parse(s)}catch(e){}
 if(!db)db=structuredClone(INIT);
 // Older data kept a copy of each word inside every root. Merge them into one global list db.words.
@@ -141,30 +142,32 @@ const K=()=>db.known;
 const rk=r=>r.c+r.t;
 const findRoots=c=>db.roots.filter(r=>r.c===c);
 const inRoot=(w,r)=>w.s.some(s=>s.c===r.c&&(s.t||'')===(r.t||''));
-const rootWords=r=>db.words.filter(w=>inRoot(w,r));
+const shown=(w,r)=>inRoot(w,r)&&!(w.x||[]).includes(rk(r));
+const rootWords=r=>db.words.filter(w=>shown(w,r));
 function resolve(s){if(s.t)return db.roots.find(r=>r.c===s.c&&r.t===s.t);const l=findRoots(s.c);return l.length===1?l[0]:null}
 function changed(){dirty=true;try{localStorage.setItem(LS,JSON.stringify(db))}catch(e){}status()}
 function status(){const e=$('#st');e.textContent=dirty?'Unexported changes: press the export icon':'';e.className='st'+(dirty?' d':'')}
 function sylSpan(s,showTag){
   const ro=resolve(s),k=ro?rk(ro):s.c+(s.t||''),none=s.t?!ro:!findRoots(s.c).length;
-  return `<span class="syl${K().roots[k]?' kn':''}${ro&&ro===db.roots[cur]?' self':''}" data-c="${esc(s.c)}" data-t="${esc(s.t||'')}" data-g="${esc(s.g||'')}" data-k="${esc(k)}" title="${none?'No table yet':''}">${esc(s.c)}${showTag&&s.t?`<sup>${esc(s.t)}</sup>`:''}</span>`}
+  return `<span class="syl${K().roots[k]?' kn':''}${!master&&ro&&ro===db.roots[cur]?' self':''}" data-c="${esc(s.c)}" data-t="${esc(s.t||'')}" data-g="${esc(s.g||'')}" data-k="${esc(k)}" title="${none?'No table yet':''}">${esc(s.c)}${showTag&&s.t?`<sup>${esc(s.t)}</sup>`:''}</span>`}
 function bd(s){const ro=resolve(s);
   const g=s.g?esc(s.g):(ro&&(ro.m||ro.h)?`<i>${esc(ro.m)}${ro.h?` (${esc(ro.h)})`:''}</i>`:'');
   return `<span class="bd">${sylSpan(s,true)} <span class="g">${g}</span></span>`}
 const SP=`<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>`;
 const spBtn=(t,l)=>`<button class="sp" data-say="${esc(t)}" title="Listen: ${esc(l||t)}" aria-label="Listen: ${esc(l||t)}">${SP}</button>`;
 const kBtn=(t,k,txt)=>{const on=!!K()[t][k];return `<button class="kb${on?' on':''}" data-t="${t}" data-k="${esc(k)}" aria-pressed="${on}" title="${on?'Learned (tap to unmark)':'Mark as learned'}">${txt||'✓'}</button>`};
-function row(w){const i=db.words.indexOf(w);return `<tr><td class="wd${K().words[w.w]?' kn':''}" data-w="${esc(w.w)}">${w.s.map(s=>sylSpan(s)).join('')}</td><td>${esc(w.m)}</td><td>${w.s.map(bd).join('')}</td><td class="ac">${kBtn('words',w.w)}${spBtn(w.w)}<button class="ed" data-i="${i}" title="Edit">✎</button></td></tr>`}
+function row(w,all){const i=db.words.indexOf(w);return `<tr><td class="wd${K().words[w.w]?' kn':''}" data-w="${esc(w.w)}">${w.s.map(s=>sylSpan(s)).join('')}</td><td>${esc(w.m)}</td><td>${w.s.map(bd).join('')}</td>${all?`<td class="tb">${db.roots.filter(r=>inRoot(w,r)).map(r=>{const h=(w.x||[]).includes(rk(r));return `<span class="${h?'hid':''}"${h?' title="Removed from this table"':''}>${esc(rk(r))}</span>`}).join(' ')||'—'}</td>`:''}<td class="ac">${kBtn('words',w.w)}${spBtn(w.w)}<button class="ed" data-i="${i}" title="Edit">✎</button></td></tr>`}
 function render(){
-  $('#side').innerHTML=db.roots.map((r,i)=>`<button class="ri${i==cur?' on':''}${K().roots[rk(r)]?' kn':''}" data-i="${i}">${esc(rk(r))} <small>${esc(r.m)}</small></button>`).join('')+'<button class="ri add" id="newroot">+ New root</button>';
+  $('#side').innerHTML=`<button class="ri${master?' on':''}" id="allwords">All words <small>${db.words.length}</small></button>`+db.roots.map((r,i)=>`<button class="ri${!master&&i==cur?' on':''}${K().roots[rk(r)]?' kn':''}" data-i="${i}">${esc(rk(r))} <small>${esc(r.m)}</small></button>`).join('')+'<button class="ri add" id="newroot">+ New root</button>';
   const r=db.roots[cur];
-  $('#rb').textContent='☰ '+(r?rk(r):'Roots');
+  $('#rb').textContent='☰ '+(master?'All words':r?rk(r):'Roots');
+  if(master){$('#main').innerHTML=`<div class="bk"></div><div class="top"><h2>All words <span class="mm">${db.words.length}</span></h2></div><div class="scroll"><table><thead><tr><th>Word<th>Meaning<th>Breakdown<th>Tables<th></tr></thead><tbody>${db.words.map(w=>row(w,true)).join('')}</tbody></table></div>`;status();return}
   if(!r){$('#main').innerHTML='<p>No roots yet.</p>';return}
   $('#main').innerHTML=`<div class="bk">${hist.length&&db.roots[hist[hist.length-1]]?`<button id="back" title="Go back"><span class="ar">←</span> ${esc(rk(db.roots[hist[hist.length-1]]))}</button>`:''}</div>
   <div class="top"><h2><span data-k="${esc(rk(r))}" class="${K().roots[rk(r)]?'kn':''}">${esc(rk(r))}</span>${r.h?` <span class="mm">(${esc(r.h)})</span>`:''} <span class="mm">${esc(r.m)}</span></h2>${kBtn('roots',rk(r),'✓ Learned')}${spBtn(r.c,rk(r))}<button id="editroot">Edit root</button></div>
-  <div class="scroll"><table><thead><tr><th>Word<th>Meaning<th>Breakdown<th></tr></thead><tbody>${rootWords(r).map(row).join('')}</tbody></table></div><button id="addword">+ Add word</button>`;
+  <div class="scroll"><table><thead><tr><th>Word<th>Meaning<th>Breakdown<th></tr></thead><tbody>${rootWords(r).map(w=>row(w)).join('')}</tbody></table></div><button id="addword">+ Add word</button>`;
   status()}
-function open(i){if(i!==cur){hist.push(cur);cur=i}render();scrollTo(0,0)}
+function open(i){master=false;if(i!==cur){hist.push(cur);cur=i}render();scrollTo(0,0)}
 function go(el){const c=el.dataset.c,t=el.dataset.t,g=el.dataset.g;
   if(t){const i=db.roots.findIndex(r=>r.c==c&&r.t==t);return i<0?newRoot(c,t,g):open(i)}
   const l=db.roots.map((r,i)=>[r,i]).filter(x=>x[0].c==c);
@@ -177,6 +180,7 @@ function showHelp(){
 <p>Many Korean words are built from Sino-Korean syllables that keep the same meaning wherever they appear. Each root (like <b>국</b> “country”) has a table of words that use it, and every word is broken down syllable by syllable.</p>
 <h4>Browsing</h4>
 <ul><li>Pick a root from the list on the side (on a phone, tap <b>☰ Roots</b>).</li>
+<li>Choose <b>All words</b> at the top of that list to see the whole shared word list and which tables show each word. A crossed-out table means the word was removed from it.</li>
 <li><b>Click any syllable</b> in a word to jump to that syllable’s own root table. Use <b>← Back</b> to return.</li>
 <li>If a syllable has no table yet, you’ll be asked whether to create one.</li></ul>
 <h4>Pronunciation</h4>
@@ -184,9 +188,9 @@ function showHelp(){
 <h4>Searching</h4>
 <ul><li>Use the search box under the title to find a word, root, meaning, or hanja across all roots. Click a result to jump to it (use ↑ ↓ and Enter on a keyboard).</li></ul>
 <h4>Adding and editing</h4>
-<ul><li>All words live in one shared list. Each table shows every word that contains that root’s syllable, so editing or deleting a word changes it everywhere.</li><li><b>+ Add word</b>: type the Korean word. A row appears for each syllable where you can set a tag and a meaning (optional; it defaults to the root’s meaning).</li>
+<ul><li>All words live in one shared list. Each table shows every word that contains that root’s syllable, so editing a word changes it everywhere. <b>Remove from table</b> (in a word’s edit dialog) only hides it from the current table; add the same word again there to bring it back.</li><li><b>+ Add word</b>: type the Korean word. A row appears for each syllable where you can set a tag and a meaning (optional; it defaults to the root’s meaning).</li>
 <li><b>Tag</b>: use it to tell apart different roots that share the same syllable (e.g. two different roots both pronounced 사).</li>
-<li><b>✎</b> edits or deletes a word. <b>Edit root</b> changes a root’s meaning and hanja. <b>+ New root</b> adds a new one.</li></ul>
+<li><b>✎</b> edits a word or removes it from this table (in All words, it deletes the word from the master list). <b>Edit root</b> changes a root’s meaning and hanja. <b>+ New root</b> adds a new one.</li></ul>
 <h4>Marking what you’ve learned</h4>
 <ul><li>Tap the <b>✓</b> button on a word’s row to mark that word as learned. Tap it again to unmark.</li>
 <li>At the top of a root’s table, tap <b>✓ Learned</b>. A syllable’s root is one click away: click the syllable, then mark it there.</li>
@@ -205,6 +209,7 @@ function modal(title,body,btns){
   d.querySelector('form').onsubmit=e=>e.preventDefault();
   btns.forEach(x=>{const e=document.createElement('button');e.type='button';e.textContent=x.label;e.onclick=()=>{if(x.fn&&x.fn(d)===false)return;d.close()};d.querySelector('.btns').append(e)});
   d.addEventListener('close',()=>d.remove());document.body.append(d);d.showModal();return d}
+const note=(title,msg)=>modal(title,`<p>${msg}</p>`,[{label:'OK'}]);
 // Pull meaning/hanja out of a breakdown gloss like "middle, center (中)"
 function parseGloss(g){g=(g||'').trim();if(!g)return{m:'',h:''};
   const m=g.match(/^(.*?)\s*\(([^)]*)\)\s*$/);
@@ -218,7 +223,7 @@ function findGloss(c,t,own){if(own)return own;
 function newRoot(c,t,g){const pre=parseGloss(findGloss(c,t,g));
   const d=modal(`No table for ${esc(c+t)} yet`,`<div class="row2"><label>Syllable<input id="c" value="${esc(c)}"></label><div class="tg"><span class="tl">Tag <button type="button" class="tgi" aria-label="What is a tag?">?</button></span><input id="t" value="${esc(t)}" maxlength="1" autocomplete="off"></div><div class="tgn" role="tooltip" hidden>Optional, one character. Use it to tell apart different roots that share the same syllable (for example, two different roots both pronounced 사). Give each one a different tag.</div></div>`+f('m','Meaning (optional)',pre.m)+f('h','Hanja (optional)',pre.h),
   [{label:'Cancel'},{label:'Create table',fn:d=>{const c=v(d,'c').trim(),t=v(d,'t').trim();if(!c)return false;
-    if(db.roots.some(r=>r.c==c&&r.t==t)){alert('A root with this syllable and tag already exists. Add a different tag.');return false}
+    if(db.roots.some(r=>r.c==c&&r.t==t)){note('Root already exists','A root with this syllable and tag already exists. Use a different tag to tell them apart.');return false}
     db.roots.push({c,t,m:v(d,'m').trim(),h:v(d,'h').trim()});changed();open(db.roots.length-1)}}]);
   const bt=d.querySelector('.tgi'),nt=d.querySelector('.tgn');let pin=false;
   const show=x=>{nt.hidden=!x};
@@ -230,11 +235,13 @@ function editRoot(){const r=db.roots[cur];
 function wordForm(i){
   const r=db.roots[cur],old=i==null?null:db.words[i];let rows=old?old.s.map(s=>({...s})):[];
   const d=modal(old?esc(old.w):'Add word',f('w','Word (Korean)',old?old.w:'')+f('m','Meaning',old?old.m:'')+'<div class="sub">Breakdown: edit the tag or meaning of each syllable</div><div id="bdx"></div>',
-  [...(old?[{label:'Delete',fn:()=>{if(!confirm('Delete this word from the shared word list? It will disappear from every table.'))return false;db.words.splice(i,1);changed();render()}}]:[]),{label:'Cancel'},
-   {label:'Save',fn:d=>{grab();const w=v(d,'w').trim();if(!w||!rows.length){alert('Enter a Korean word.');return false}
-     if(db.words.some((x,k)=>x.w===w&&k!==i)){alert('“'+w+'” is already in the word list. It shows up in every table that matches its syllables.');return false}
-     const it={w,m:v(d,'m').trim(),l:old?old.l:'',s:rows};
-     if(!old&&!inRoot(it,r)){alert('The word must contain '+rk(r)+' (with its tag) to appear in this table.');return false}
+  [...(old?[master?{label:'Delete',fn:ed=>{modal('Delete this word?','<p>'+esc(old.w)+' will be removed from the master list and from every table.</p>',[{label:'Cancel'},{label:'Delete',fn:()=>{db.words.splice(i,1);changed();render();ed.close()}}]);return false}}:{label:'Remove from table',fn:()=>{const k=rk(r);if(!(old.x=old.x||[]).includes(k))old.x.push(k);changed();render()}}]:[]),{label:'Cancel'},
+   {label:'Save',fn:d=>{grab();const w=v(d,'w').trim();if(!w||!rows.length){note('Word needed','Enter a word that contains at least one Korean syllable.');return false}
+     const ex=db.words.find((x,k)=>x.w===w&&k!==i);
+     if(ex&&!old&&inRoot(ex,r)&&(ex.x||[]).includes(rk(r))){ex.x=ex.x.filter(k=>k!==rk(r));changed();render();return}
+     if(ex){note('Word already exists',esc(w)+' is already in the master list. It appears in every table that matches its syllables.');return false}
+     const it={w,m:v(d,'m').trim(),l:old?old.l:'',s:rows};if(old&&old.x)it.x=old.x;
+     if(!old&&!inRoot(it,r)){note('Word doesn’t fit this table','To appear in this table, the word must contain '+esc(rk(r))+' with the same tag. Check the tags in the breakdown.');return false}
      old?db.words[i]=it:db.words.push(it);changed();render()}}]);
   const grab=()=>d.querySelectorAll('.bx').forEach((e,k)=>{if(rows[k]){rows[k].t=e.querySelector('.t').value.trim();rows[k].g=e.querySelector('.g').value.trim()}});
   const build=()=>{grab();const ch=[...v(d,'w')].filter(x=>/[가-힣]/.test(x));
@@ -247,7 +254,8 @@ document.addEventListener('click',e=>{const t=e.target,syl=t.closest('.syl');
   const b=t.closest('button');if(!b||b.closest('dialog'))return;
   if(b.classList.contains('sp'))speak(b.dataset.say,b);
   else if(b.classList.contains('kb')){const m=K()[b.dataset.t],k=b.dataset.k,y=scrollY;m[k]?delete m[k]:m[k]=1;changed();render();scrollTo(0,y)}
-  else if(b.classList.contains('ri')&&b.dataset.i!=null){hist=[];cur=+b.dataset.i;document.body.classList.remove('ro');render()}
+  else if(b.classList.contains('ri')&&b.dataset.i!=null){master=false;hist=[];cur=+b.dataset.i;document.body.classList.remove('ro');render()}
+  else if(b.id=='allwords'){master=true;hist=[];document.body.classList.remove('ro');render();scrollTo(0,0)}
   else if(b.id=='rb')document.body.classList.toggle('ro');
   else if(b.id=='help')showHelp();
   else if(b.id=='settings')voiceSettings();
@@ -274,10 +282,10 @@ function pickVoice(){const l=koVoices();if(!l.length)return null;
   return l.slice().sort((a,b)=>vScore(b)-vScore(a))[0]}
 let warned=false;
 function say(t,btn,force){
-  if(!('speechSynthesis' in window)){alert('Speech is not supported in this browser.');return}
+  if(!('speechSynthesis' in window)){note('No speech support','This browser can’t read words aloud. Try a different browser, such as Chrome, Edge or Safari.');return}
   const ss=speechSynthesis;ss.cancel();
   const vs=ss.getVoices(),v=pickVoice();
-  if(vs.length&&!v&&!warned){warned=true;alert('No Korean voice is installed on this device. Add one in your system’s speech/language settings.')}
+  if(vs.length&&!v&&!warned){warned=true;note('No Korean voice found','This device has no Korean voice installed, so pronunciation may be silent or wrong. Add one in your system’s speech or language settings.')}
   const u=new SpeechSynthesisUtterance(t);u.lang='ko-KR';if(v)u.voice=v;u.rate=vp.r||1;
   if(btn){btn.classList.add('on');const off=()=>btn.classList.remove('on');u.onend=off;u.onerror=off}
   ss.speak(u)}
@@ -298,7 +306,7 @@ function search(t){t=nz(t).trim();if(!t)return[];const out=[];
     const rh=nz([rk(r),r.m,r.h].join(' '));
     if(rh.includes(t))out.push({k:'root',i,sc:nz(rk(r)).startsWith(t)||nz(r.m).startsWith(t)?0:1});
     });
-  db.words.forEach((w,j)=>{const i=db.roots.findIndex(r=>inRoot(w,r));if(i<0)return;
+  db.words.forEach((w,j)=>{const i=db.roots.findIndex(r=>shown(w,r));if(i<0)return;
     const hs=nz([w.w,w.m,w.l,...w.s.map(s=>s.g)].join(' '));
     if(hs.includes(t))out.push({k:'word',i,j,sc:nz(w.w).startsWith(t)||nz(w.m).startsWith(t)?0:2})});
   return out.sort((a,b)=>a.sc-b.sc).slice(0,40)}
@@ -312,7 +320,7 @@ function runSearch(){const t=q.value;if(!t.trim()){hideSr();return}
     return `<button class="sri" data-n="${n}"><b>${esc(w.w)}</b><small>${esc(w.m)}</small><span class="tg">in ${esc(rk(r))}</span></button>`}).join(''):'<div class="sre">No matches</div>';
   sr.style.display='block'}
 function pick(n){const x=sres[n];if(!x)return;
-  hideSr();q.value='';q.blur();hist=[];cur=x.i;document.body.classList.remove('ro');render();scrollTo(0,0);
+  hideSr();q.value='';q.blur();master=false;hist=[];cur=x.i;document.body.classList.remove('ro');render();scrollTo(0,0);
   if(x.k=='word'){const wv=db.words[x.j].w,tr=[...$('#main tbody').children].find(e=>e.firstElementChild.dataset.w===wv);if(tr){tr.classList.add('hit');tr.scrollIntoView({block:'center'})}}}
 q.addEventListener('input',runSearch);
 q.addEventListener('focus',()=>{if(q.value.trim())runSearch()});
@@ -340,10 +348,13 @@ function mergeIn(inc){const key=r=>r.c+(r.t||''),have=new Map(db.roots.map(r=>[k
     w.s.forEach((x,i)=>{const y=o.s[i];if(y&&y.c===x.c&&!y.g&&x.g)y.g=x.g})}
   for(const k of ['words','roots'])Object.assign(db.known[k],inc.known[k]);
   return{nr,nw,kw}}
-function loadText(t,mode){try{const d=JSON.parse(t);if(!Array.isArray(d.roots))throw 0;migrate(d);
+function loadText(t,mode){let d;const T='Can’t import this file';
+  try{d=JSON.parse(t)}catch(e){return note(T,'It isn’t valid JSON. Choose a file saved with the Export button.')}
+  if(!d||!Array.isArray(d.roots))return note(T,'It has no “roots” list, so it doesn’t look like a KoreanRootsApp export. Choose a file saved with the Export button.');
+  try{if(!d.roots.every(r=>r&&typeof r.c==='string'))throw 0;migrate(d)}catch(e){return note(T,'Some roots or words in it are malformed, so it couldn’t be read. Nothing was changed.')}
   if(mode==='merge'){const r=mergeIn(d);if(cur>=db.roots.length)cur=0;hist=[];changed();render();
     modal('Merge complete',`<p>Added ${r.nr} new root${r.nr==1?'':'s'} and ${r.nw} new word${r.nw==1?'':'s'}. ${r.kw} word${r.kw==1?' was':'s were'} already here and kept as ${r.kw==1?'it is':'they are'}.</p>`,[{label:'Close'}])}
-  else{db=d;cur=0;hist=[];changed();dirty=false;render()}}catch(x){alert('That file is not a valid roots database.')}}
+  else{db=d;master=false;cur=0;hist=[];changed();dirty=false;render()}}
 $('#save').onclick=async()=>{const txt=JSON.stringify(db,null,1),name=fname();
   if(window.showSaveFilePicker){try{if(fh&&fh.name!==name)fh=null;if(!fh){fh=await showSaveFilePicker({suggestedName:name,types:FT});fnEl.value=base(fh.name)}
     const w=await fh.createWritable();await w.write(txt);await w.close();dirty=false;status();return}
