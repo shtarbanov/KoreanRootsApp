@@ -130,7 +130,7 @@ td:last-child{position:absolute;top:8px;right:8px;padding:0}
 dialog{width:94vw;max-height:88vh;overflow-y:auto;padding:14px}
 dialog input{font-size:16px;padding:8px}.bx .t{width:60px}
 }
-@media (max-width:480px){header h1{flex:1 1 100%}#rb{margin-left:auto}}
+@media (max-width:480px){header{padding:8px;gap:4px}header h1{gap:6px}.rn{display:none}#rb{padding:4px 8px}header .ic{padding:4px 6px}#help{margin-left:0}}
 @media (hover:none){.syl:hover{background:none}}
 body{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 </style>
@@ -205,7 +205,7 @@ function row(w,all){const i=db.words.indexOf(w);return `<tr><td class="kc">${kBt
 function render(){
   $('#side').innerHTML=`<button class="ri${master?' on':''}" id="allwords">All words <small>${db.words.length}</small></button>`+db.roots.map((r,i)=>`<button class="ri${!master&&i==cur?' on':''}${K().roots[rk(r)]?' kn':''}" data-i="${i}">${esc(rk(r))} <small>${esc(r.m)}</small></button>`).join('')+'<button class="ri add" id="newroot">+ New root</button>';
   const r=db.roots[cur];
-  $('#rb').textContent='☰ '+(master?'All words':r?rk(r):'Roots');
+  {const rn=master?'All words':r?rk(r):'Roots';$('#rb').innerHTML='☰<span class="rn"> '+esc(rn)+'</span>';$('#rb').setAttribute('aria-label','Roots list: '+rn)}
   if(master){$('#main').innerHTML=`<div class="bk"></div><div class="top"><h2>All words <span class="mm" id="mcount"></span></h2></div><div class="mf"><input id="mq" type="search" placeholder="Filter words…" aria-label="Filter words" autocomplete="off" spellcheck="false" value="${esc(mf.q)}"><select id="ms" aria-label="Show">${[['all','All words'],['hidden','Removed from a table'],['orphan','Not in any table'],['learned','Learned'],['unlearned','Not learned']].map(([k,n])=>`<option value="${k}"${mf.s===k?' selected':''}>${n}</option>`).join('')}</select><select id="mt" aria-label="Table"><option value="">Any table</option>${db.roots.map(r=>`<option value="${esc(rk(r))}"${mf.t===rk(r)?' selected':''}>${esc(rk(r))} ${esc(r.m)}</option>`).join('')}</select></div><div class="scroll"><table><thead><tr><th class="kc"></th><th>Word<th>Meaning<th>Breakdown<th>Tables<th></tr></thead><tbody id="mtb"></tbody></table></div>`;fillMaster();status();return}
   if(!r){$('#main').innerHTML='<p>No roots yet.</p>';return}
   $('#main').innerHTML=`<div class="bk">${hist.length&&db.roots[hist[hist.length-1]]?`<button id="back" title="Go back"><span class="ar">←</span> ${esc(rk(db.roots[hist[hist.length-1]]))}</button>`:''}</div>
