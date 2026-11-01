@@ -350,7 +350,7 @@ document.addEventListener('click',e=>{const t=e.target,syl=t.closest('.syl');
   if(syl&&$('#main').contains(syl)){if(syl.classList.contains('self'))return;if(getSelection().toString().trim())return;clearTimeout(ct);ct=setTimeout(()=>go(syl),220);return}
   const b=t.closest('button');if(!b||b.closest('dialog'))return;
   if(b.classList.contains('sp'))speak(b.dataset.say,b);
-  else if(b.classList.contains('kb')){const m=K()[b.dataset.t],k=b.dataset.k,y=scrollY;const was=!!m[k];was?delete m[k]:m[k]=1;changed();render();scrollTo(0,y);if(!was&&matchMedia('(max-width:700px)').matches)toast(k+' marked as learned ✓')}
+  else if(b.classList.contains('kb')){const m=K()[b.dataset.t],k=b.dataset.k,y=scrollY;const was=!!m[k];was?delete m[k]:m[k]=1;changed();render();scrollTo(0,y);if(matchMedia('(max-width:700px)').matches)toast(was?k+' unmarked as learned':k+' marked as learned ✓')}
   else if(b.classList.contains('ri')&&b.dataset.i!=null){master=false;hist=[];cur=+b.dataset.i;document.body.classList.remove('ro');render()}
   else if(b.id=='allwords'){master=true;hist=[];document.body.classList.remove('ro');render();scrollTo(0,0)}
   else if(b.id=='rb')document.body.classList.toggle('ro');
