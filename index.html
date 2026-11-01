@@ -115,7 +115,7 @@ dialog input{display:block;width:100%;font:inherit;padding:4px 6px;margin-top:2p
 .urow{display:flex;gap:8px}.urow input{flex:1;min-width:0}.pane{margin-top:0;font-size:14px;color:var(--mut)}.pane input{margin:0}
 .opt{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--fg)}dialog input[type=radio]{display:inline-block;width:auto;margin:0;padding:0}
 @media (max-width:700px){
-header{padding:8px 12px;gap:6px}header h1{font-size:16px}.st{order:5;width:100%}
+header{padding:8px 12px;gap:6px}header h1{font-size:16px}.st{display:none}#save{position:relative}#save.dirty::after{content:'';position:absolute;top:5px;right:5px;width:10px;height:10px;border-radius:50%;background:var(--no);border:2px solid var(--card);box-sizing:content-box;margin:-2px -2px 0 0}
 button{min-height:38px;padding:4px 12px}
 .wrap{flex-direction:column;padding:10px 12px;gap:10px}
 aside{display:none;width:100%;flex-direction:row;flex-wrap:wrap;gap:6px}body.ro aside{display:flex}#rb{display:inline-block}.scroll{overflow:visible}
@@ -196,7 +196,7 @@ const shown=(w,r)=>inRoot(w,r)&&!(w.x||[]).includes(rk(r));
 const rootWords=r=>db.words.filter(w=>shown(w,r));
 function resolve(s){if(s.t)return db.roots.find(r=>r.c===s.c&&r.t===s.t);const l=findRoots(s.c);return l.length===1?l[0]:null}
 function changed(){dirty=true;try{localStorage.setItem(LS,JSON.stringify(db))}catch(e){}status()}
-function status(){const e=$('#st');e.textContent=dirty?'Unexported changes: press the export icon':'';e.className='st'+(dirty?' d':'')}
+function status(){const e=$('#st');e.textContent=dirty?'Unexported changes: press the export icon':'';e.className='st'+(dirty?' d':'');const sv=$('#save');sv.classList.toggle('dirty',dirty);const l=dirty?'Export JSON (unexported changes)':'Export JSON';sv.title=l;sv.setAttribute('aria-label',l)}
 function sylSpan(s,showTag){
   const ro=resolve(s),k=ro?rk(ro):s.c+(s.t||''),none=s.t?!ro:!findRoots(s.c).length;
   return `<span class="syl${K().roots[k]?' kn':''}${!master&&ro&&ro===db.roots[cur]?' self':''}" data-c="${esc(s.c)}" data-t="${esc(s.t||'')}" data-g="${esc(s.g||'')}" data-k="${esc(k)}" title="${none?'No table yet':''}">${esc(s.c)}${showTag&&s.t?(/^[¹²³⁴-⁹]$/.test(s.t)?esc(s.t):`<sup>${esc(s.t)}</sup>`):''}</span>`}
@@ -212,7 +212,7 @@ function render(){
   $('#side').innerHTML=`<button class="ri${master?' on':''}" id="allwords">All words <small>${db.words.length}</small></button>`+db.roots.map((r,i)=>`<button class="ri${!master&&i==cur?' on':''}${K().roots[rk(r)]?' kn':''}" data-i="${i}">${esc(rk(r))} <small>${esc(r.m)}</small></button>`).join('')+'<button class="ri add" id="newroot">+ New root</button>';
   const r=db.roots[cur];
   {const rn=master?'All words':r?rk(r):'Roots';$('#rb').innerHTML='☰<span class="rn"> '+esc(rn)+'</span>';$('#rb').setAttribute('aria-label','Roots list: '+rn)}
-  if(master){$('#main').innerHTML=`<div class="bk"></div><div class="top"><h2>All words <span class="mm" id="mcount"></span></h2></div><div class="mf"><input id="mq" type="search" placeholder="Filter words…" aria-label="Filter words" autocomplete="off" spellcheck="false" value="${esc(mf.q)}"><select id="ms" aria-label="Show">${[['all','All words'],['hidden','Removed from a table'],['orphan','Not in any table'],['learned','Learned'],['unlearned','Not learned']].map(([k,n])=>`<option value="${k}"${mf.s===k?' selected':''}>${n}</option>`).join('')}</select><select id="mt" aria-label="Table"><option value="">Any table</option>${db.roots.map(r=>`<option value="${esc(rk(r))}"${mf.t===rk(r)?' selected':''}>${esc(rk(r))} ${esc(r.m)}</option>`).join('')}</select></div><div class="scroll"><table><thead><tr><th class="kc"></th><th>Word<th>Meaning<th>Breakdown<th>Tables<th></tr></thead><tbody id="mtb"></tbody></table></div>`;fillMaster();status();return}
+  if(master){$('#main').innerHTML=`<div class="bk"></div><div class="top"><h2>All words <span class="mm" id="mcount"></span></h2></div><div class="mf"><input id="mq" type="search" placeholder="Filter words…" aria-label="Filter words" autocomplete="off" spellcheck="false" value="${esc(mf.q)}"><select id="ms" aria-label="Filter by status">${[['all',''],['learned','Learned'],['unlearned','Not learned'],['orphan','Unassigned']].map(([k,n])=>`<option value="${k}"${mf.s===k?' selected':''}>${n}</option>`).join('')}</select><select id="mt" aria-label="Root"><option value="">Any root</option>${db.roots.map(r=>`<option value="${esc(rk(r))}"${mf.t===rk(r)?' selected':''}>${esc(rk(r))} ${esc(r.m)}</option>`).join('')}</select></div><div class="scroll"><table><thead><tr><th class="kc"></th><th>Word<th>Meaning<th>Breakdown<th>Tables<th></tr></thead><tbody id="mtb"></tbody></table></div>`;fillMaster();status();return}
   if(!r){$('#main').innerHTML='<p>No roots yet.</p>';return}
   $('#main').innerHTML=`<div class="bk">${hist.length&&db.roots[hist[hist.length-1]]?`<button id="back" title="Go back"><span class="ar">←</span> ${esc(rk(db.roots[hist[hist.length-1]]))}</button>`:''}</div>
   <div class="top">${kBtn('roots',rk(r))}<h2><span data-k="${esc(rk(r))}" class="${K().roots[rk(r)]?'kn':''}">${esc(rk(r))}</span>${r.h?` <span class="mm">(${esc(r.h)})</span>`:''} <span class="mm">${esc(r.m)}</span></h2>${spBtn(r.c,rk(r))}<button id="editroot" class="ed" title="Edit root" aria-label="Edit root">${ED}</button></div>
@@ -248,7 +248,7 @@ function showHelp(){
 <p>Many Korean words are built from Sino-Korean syllables that keep the same meaning wherever they appear. Each root (like <b>국</b> “country”) has a table of words that use it, and every word is broken down syllable by syllable.</p>
 <h4>Browsing</h4>
 <ul><li>Pick a root from the list on the side (on a phone, tap <b>☰ Roots</b>).</li>
-<li>Choose <b>All words</b> at the top of that list to see the whole shared word list and which tables show each word. A crossed-out table means the word was removed from it. Use the filters at the top to narrow the list by text, by table, or by status (removed from a table, not in any table, learned).</li>
+<li>Choose <b>All words</b> at the top of that list to see the whole shared word list and which tables show each word. A crossed-out table means the word was removed from it. Use the filters at the top to narrow the list by text, by table, or by status (learned, not learned, or unassigned, meaning not shown in any root’s table).</li>
 <li><b>Click any syllable</b> in a word to jump to that syllable’s own root table. Use <b>← Back</b> to return.</li>
 <li>If a syllable has no table yet, you’ll be asked whether to create one.</li></ul>
 <h4>Pronunciation</h4>
