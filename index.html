@@ -105,7 +105,7 @@ dialog select{display:block;width:100%;font:inherit;font-size:16px;padding:6px;m
 .tgn{position:absolute;left:0;right:0;top:100%;margin-top:6px;z-index:5;font-size:13px;line-height:1.4;padding:8px 10px;background:var(--fg);color:var(--bg);border-radius:6px;box-shadow:0 2px 8px #0006}
 .tgn[hidden]{display:none}
 h4.sec{margin:0 0 2px;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--mut)}
-dialog::backdrop{background:#0006}
+dialog::backdrop{background:#0006}.srow{display:flex;align-items:center;gap:10px;margin-top:4px}.srow input{flex:1;min-width:0;margin-top:0}.srow button{flex:none}
 dialog h3{margin:0 0 8px}dialog label{display:block;font-size:13px;color:var(--mut);margin-top:8px}
 dialog input{display:block;width:100%;font:inherit;padding:4px 6px;margin-top:2px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:5px}
 .sub{margin-top:12px;font-size:13px;color:var(--mut)}
@@ -281,6 +281,8 @@ function modal(title,body,btns){
   btns.forEach(x=>{const e=document.createElement('button');e.type='button';e.textContent=x.label;e.onclick=()=>{if(x.fn&&x.fn(d)===false)return;d.close()};d.querySelector('.btns').append(e)});
   d.addEventListener('close',()=>d.remove());document.body.append(d);d.showModal();return d}
 function addX(d){const w=document.createElement('div');w.className='xw';w.innerHTML='<button type="button" class="x" aria-label="Close" title="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';w.firstChild.onclick=()=>d.close();d.querySelector('form').prepend(w)}
+function outClose(d){let dn=false;d.addEventListener('mousedown',e=>{dn=e.target===d&&out(d,e)});d.addEventListener('click',e=>{if(dn&&e.target===d&&out(d,e))d.close();dn=false})}
+function out(d,e){const r=d.getBoundingClientRect();return e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom}
 const note=(title,msg)=>modal(title,`<p>${msg}</p>`,[{label:'OK'}]);
 // Pull meaning/hanja out of a breakdown gloss like "middle, center (中)"
 function parseGloss(g){g=(g||'').trim();if(!g)return{m:'',h:''};
@@ -399,8 +401,12 @@ if('speechSynthesis' in window){speechSynthesis.getVoices();speechSynthesis.addE
 function voiceSettings(){
   const l=koVoices().slice().sort((a,b)=>vScore(b)-vScore(a)),auto=pickVoice();
   const opts='<option value="">Automatic (best available'+(auto&&!vp.v?': '+esc(auto.name):'')+')</option>'+l.map(x=>`<option value="${esc(x.name)}"${x.name===vp.v?' selected':''}>${esc(x.name)}${x.localService===false?' (online)':''}</option>`).join('');
-  const d=modal('Settings','<label>Theme<select id="thsel">'+[['system','Match device'],['light','Light'],['dark','Dark']].map(([k,n])=>`<option value="${k}"${k===theme?' selected':''}>${n}</option>`).join('')+'</select></label>'+(l.length?`<label>Voice<select id="vsel">${opts}</select></label><label>Pronunciation speed: <span id="vrv">${(vp.r||1).toFixed(2)}</span>×<input id="vr" type="range" min="0.5" max="1.3" step="0.05" value="${vp.r||1}"></label><p class="sub">Voices named “Natural”, “Neural”, “Google”, or “Premium/Enhanced” usually sound best. More voices can be installed in your device’s speech or language settings.</p>`:'<p>No Korean voices were found on this device. Install one in your system’s speech or language settings, then reload this page.</p>'),
-  [{label:'Test',fn:d=>{if(l.length){const sl=d.querySelector('#vsel');vp.v=sl.value;vp.r=+d.querySelector('#vr').value;say('한국, 중국, 미국')}return false}},{label:'Done',fn:d=>{if(l.length){vp.v=d.querySelector('#vsel').value;vp.r=+d.querySelector('#vr').value;saveVp()}}}]);
+  const d=modal('Settings','<label>Theme<select id="thsel">'+[['system','Match device'],['light','Light'],['dark','Dark']].map(([k,n])=>`<option value="${k}"${k===theme?' selected':''}>${n}</option>`).join('')+'</select></label>'+(l.length?`<label>Voice<select id="vsel">${opts}</select></label><label>Pronunciation speed: <span id="vrv">${(vp.r||1).toFixed(2)}</span>×<div class="srow"><input id="vr" type="range" min="0.5" max="1.3" step="0.05" value="${vp.r||1}"><button type="button" id="vtest">Test</button></div></label><p class="sub">Voices named “Natural”, “Neural”, “Google”, or “Premium/Enhanced” usually sound best. More voices can be installed in your device’s speech or language settings.</p>`:'<p>No Korean voices were found on this device. Install one in your system’s speech or language settings, then reload this page.</p>'),
+  []);
+  d.querySelector('.btns').remove();addX(d);outClose(d);
+  const sv=()=>{if(l.length){vp.v=d.querySelector('#vsel').value;vp.r=+d.querySelector('#vr').value}};
+  d.addEventListener('close',()=>{if(l.length){sv();saveVp()}});
+  {const tb=d.querySelector('#vtest');if(tb)tb.onclick=()=>{sv();say('한국, 중국, 미국')}}
   d.querySelector('#thsel').onchange=e=>setTheme(e.target.value);
   const r=d.querySelector('#vr');if(r)r.oninput=()=>d.querySelector('#vrv').textContent=(+r.value).toFixed(2)}
 // search
@@ -486,7 +492,8 @@ $('#load').onclick=()=>{
     fetch(u,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.text()}).then(t=>{d.close();loadText(t,mode)})
     .catch(e=>{er.style.color='var(--no)';er.textContent="Couldn't load that URL ("+e.message+"). The link must point directly to the JSON file, and the host must allow cross-site access (CORS). GitHub raw links work; many file-sharing links don't."})};
   const d=modal('Import from JSON','<div class="sub" style="margin-top:0;position:relative;display:flex;align-items:center;gap:6px">Import mode <button type="button" class="tgi" aria-label="What do Replace and Merge do?" aria-expanded="false">?</button><div class="tgn" role="tooltip" hidden><b>Replace</b>: use the imported data instead of what is here.<br><b>Merge</b>: add new roots and words from the file, and keep what is here.</div></div><label class="opt" title="Use the imported data instead of what is here"><input type="radio" name="im" value="replace" checked>Replace</label><label class="opt" title="Add new roots and words from the file, and keep what is here"><input type="radio" name="im" value="merge">Merge</label><div class="sub">Source</div><div class="seg" role="group" aria-label="Import source"><button type="button" id="sf" class="on" aria-pressed="true">File</button><button type="button" id="su" aria-pressed="false">URL</button></div><div class="panes"><div class="drop" id="pfile" tabindex="0" role="button">Drop a .json file here or click to browse</div><div class="pane" id="purl" hidden><div class="urow"><input id="u" type="url" placeholder="https://example.com/KRoots.json" autocomplete="off" spellcheck="false" aria-label="JSON file URL"><button type="button" id="lu">Load URL</button></div><div class="sub" id="ue"></div></div></div>',
-  [{label:'Cancel'}]);
+  []);
+  d.querySelector('.btns').remove();addX(d);outClose(d);
   d.classList.add('imp');
   {const bt=d.querySelector('.tgi'),nt=d.querySelector('.tgn');let pin=false;const show=x=>{nt.hidden=!x;bt.setAttribute('aria-expanded',x)};
    bt.onmouseenter=()=>show(true);bt.onmouseleave=()=>show(pin);bt.onclick=e=>{e.preventDefault();pin=!pin;show(pin)};
