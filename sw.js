@@ -1,5 +1,5 @@
 // Bump CACHE when you update the app so installed copies refresh.
-const CACHE = 'koreanroots-v20';
+const CACHE = 'koreanroots-v21';
 const ASSETS = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png',
   './icons/icon-maskable-512.png', './icons/apple-touch-icon.png',
@@ -20,6 +20,17 @@ self.addEventListener('activate', e => {
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
+  // The manifest sets the app's colors and name, so always try to get the latest one.
+  if (new URL(req.url).pathname.endsWith('.webmanifest')) {
+    e.respondWith(
+      fetch(req).then(res => {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put('./manifest.webmanifest', copy));
+        return res;
+      }).catch(() => caches.match('./manifest.webmanifest'))
+    );
+    return;
+  }
   // Pages: try network first (fresh updates), fall back to cache when offline.
   if (req.mode === 'navigate') {
     e.respondWith(
