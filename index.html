@@ -62,12 +62,38 @@ dialog.help h4{margin:14px 0 4px;font-size:14px}dialog.help p,dialog.help li{fon
 #sw{position:relative;padding:12px 16px 4px}
 #q{display:block;width:100%;max-width:560px;font:inherit;font-size:16px;padding:9px 12px 9px 38px;background:var(--inp) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%238a8a84' stroke-width='2.2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-4-4'/%3E%3C/svg%3E") no-repeat 12px center;color:var(--fg);border:1.5px solid var(--bd);border-radius:8px}
 #q::placeholder{color:var(--ph);opacity:1}
+#sw{display:flex;align-items:center;gap:8px}#q{flex:1 1 auto;min-width:0}
+#kbt{display:none;flex:none;padding:8px 9px;color:var(--mut)}#kbt.on{color:var(--acc);border-color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--card))}
+#kbm{display:none;position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:20;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 6px 24px #0004;padding:8px 10px 10px}
+@media (hover:hover) and (pointer:fine) and (min-width:701px){#kbt{display:inline-flex}body.kbon #kbm{display:block}body.kbon footer{padding-bottom:260px}}
+.kbd{user-select:none;-webkit-user-select:none}
+.kbh{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--mut);margin:0 2px 2px}
+.kbd .kbh button{width:auto;height:auto;border:0;background:none;padding:2px 6px;font-size:16px;line-height:1;color:var(--mut)}
+.kr{display:flex;justify-content:center;gap:5px;margin-top:5px}
+.kbd button{position:relative;width:42px;height:42px;padding:0;font-size:19px;display:flex;align-items:center;justify-content:center;background:var(--bg);border-radius:7px}
+.kbd button small{position:absolute;left:4px;top:1px;font-size:9px;color:var(--mut);text-transform:uppercase}
+.kbd button:active{background:color-mix(in srgb,var(--acc) 22%,var(--bg))}
+.kbd .kx{width:auto;padding:0 10px;font-size:14px}.kbd .ksp{width:260px;font-size:14px;color:var(--mut)}
+.kbd .ksh.on{background:var(--acc);color:var(--card);border-color:var(--acc)}
+dialog .kbd{margin-top:12px;padding-top:6px;border-top:1px solid var(--line)}
+dialog .kbd button{width:34px;height:36px;font-size:17px}dialog .kbd .ksp{width:180px}
 #q:focus{outline:none;border-color:var(--acc);box-shadow:0 0 0 3px #7aa7f040}
 #sr{display:none;position:absolute;z-index:15;left:16px;right:16px;top:calc(100% + 4px);max-width:520px;max-height:60vh;overflow-y:auto;background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:0 4px 14px #0003}
 .sri{display:block;width:100%;text-align:left;border:0;border-bottom:1px solid var(--line);border-radius:0;background:none;padding:7px 12px}
 .sri:last-child{border-bottom:0}.sri:hover,.sri.on{background:var(--bg)}
 .sri small{color:var(--mut);margin-left:6px}.sri .tg{color:var(--acc);font-size:12px;margin-left:6px}
 .sre{padding:10px 12px;color:var(--mut);font-size:14px}
+.sri.lk{border-top:1px dashed var(--bd)}.sri.lk .tg{white-space:nowrap}
+.lkm{margin:4px 0 8px;font-size:15px}
+.lkr{display:grid;grid-template-columns:26px 30px 1fr auto;gap:2px 10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.lkr:last-of-type{border-bottom:0}.lkr>b,.lkr .lh{font-size:20px}.lkr .lh{color:var(--acc)}
+.lkr small{display:block;color:var(--mut);font-size:12px}.lkr small.warn{color:var(--no)}
+.lkr button{font-size:13px;padding:3px 8px;white-space:nowrap}
+.lkl{margin-top:12px;font-size:13px;color:var(--mut)}.lkl a{color:var(--acc)}
+.btns button:disabled{opacity:.45;cursor:not-allowed}.btns button:disabled:hover{border-color:var(--line)}
+.enr{display:grid;grid-template-columns:auto auto 1fr auto;gap:2px 10px;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.enr>b{font-size:20px}.enr .sp{margin:0}.enr small{color:var(--mut)}.enr .lh{color:var(--acc);margin-left:4px}.enr .enx{font-size:13px;padding:3px 8px;white-space:nowrap}
+h4.sec.enh{margin:12px 0 0;font-size:13px;text-transform:none;letter-spacing:0}
 @keyframes hit{from{background:var(--kn)}to{background:transparent}}
 tr.hit>td{animation:hit 2.2s ease-out}
 .ri.kn{font-weight:700}.ri.kn small{font-weight:400}
@@ -145,7 +171,7 @@ body{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 <body class="ro">
 <header><h1><img src="icons/icon-192.png" alt="" width="30" height="30"><svg class="tt" viewBox="0 0 109.0 30" width="109.0" height="30" role="img" aria-label="Korean Roots vocabulary"><text x="0" y="13" textLength="57.4" lengthAdjust="spacing" font-family="KRC,Montserrat,system-ui,sans-serif" font-size="15.71" font-weight="500">Korean</text><text x="61.7" y="13" textLength="47.3" lengthAdjust="spacing" font-family="KRB,Montserrat,system-ui,sans-serif" font-size="15.71" font-weight="700">Roots</text><text x="0" y="25.8" textLength="109.0" lengthAdjust="spacing" font-family="KRD,'Lexend Zetta',Montserrat,system-ui,sans-serif" font-size="11" font-weight="400">vocabulary</text></svg></h1><span class="st" id="st"></span>
 <button id="load" class="ic" title="Import JSON" aria-label="Import JSON"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M2 15h10"/><path d="m9 18 3-3-3-3"/></svg></button><button id="save" class="ic" title="Export JSON" aria-label="Export JSON"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 22h14a2 2 0 0 0 2-2V7l-5-5H6a2 2 0 0 0-2 2v4"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M2 15h10"/><path d="m5 12-3 3 3 3"/></svg></button><button id="settings" class="ic" title="Settings" aria-label="Settings"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></button><button id="help" title="How to use" aria-label="How to use">?</button><input type="file" id="file" accept=".json,application/json" hidden></header>
-<div id="sw"><input id="q" type="search" placeholder="Search words, roots, meanings, romanization…" aria-label="Search" autocomplete="off" spellcheck="false"><div id="sr" role="listbox"></div></div>
+<div id="sw"><input id="q" type="search" placeholder="Search words, roots, meanings, romanization…" aria-label="Search" autocomplete="off" spellcheck="false"><button id="kbt" class="ic" title="Korean keyboard" aria-label="Korean keyboard" aria-pressed="false"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"/></svg></button><div id="sr" role="listbox"></div><div id="kbm" class="kbd" role="group" aria-label="Korean keyboard"></div></div>
 <div class="wrap"><aside id="side"></aside><main id="main"></main></div>
 <footer>Created by Ali Shtarbanov</footer>
 <script>
@@ -256,7 +282,7 @@ function showHelp(){
 <h4>Pronunciation</h4>
 <ul><li>Tap the <b>speaker</b> button next to a word (or next to the root’s title) to hear it read aloud. The sound comes from your device’s Korean voice. If it sounds poor, open <b>Settings</b> (the gear icon) to choose a better voice or change the speed. Settings also lets you switch between light and dark themes.</li></ul>
 <h4>Searching</h4>
-<ul><li>Use the search box under the title to find a word, root, meaning, hanja, or romanization (for example “hakgyo” finds 학교) across all roots. Click a result to jump to it (use ↑ ↓ and Enter on a keyboard).</li></ul>
+<ul><li>Use the search box under the title to find a word, root, meaning, hanja, or romanization (for example “hakgyo” finds 학교) across all roots. Click a result to jump to it (use ↑ ↓ and Enter on a keyboard).</li><li>On a computer, the <b>keyboard</b> button next to the search box opens an on-screen Korean keyboard you can click to type. Letters join into syllables as you go (ㅎ ㅏ ㄴ → 한); <b>Shift</b> gives the double consonants and ㅒ ㅖ, and <b>⌫</b> takes a syllable apart one letter at a time. It types into whichever box you last clicked, and while it is on, the Add word and New root dialogs show it too.</li><li>Type a Korean word that isn’t in your list, and the last result offers to <b>look it up</b>. It shows the word’s hanja and each syllable’s meaning from Wiktionary, says which of your roots match, and lets you create missing roots or add the word. Links to Wiktionary and Naver are there for a closer look. Type an English word that none of your words mean, and the last result offers to <b>translate it to Korean</b>: you get Wiktionary’s Korean translations grouped by sense, with romanization, hanja and a speaker button, plus links to Naver, Papago and Google Translate. <b>Roots ↗</b> opens a translation’s breakdown so you can add it. This needs an internet connection.</li></ul>
 <h4>Adding and editing</h4>
 <ul><li>All words live in one shared list. Each table shows every word that contains that root’s syllable, so editing a word changes it everywhere. <b>Remove from table</b> (in a word’s edit dialog) only hides it from the current table; add the same word again there to bring it back.</li><li><b>+ Add word</b>: type the Korean word. A row appears for each syllable where you can set a meaning (optional; it defaults to the root’s meaning) and, when a syllable has several roots, pick which one it belongs to.</li>
 <li><b>Tags</b>: when a syllable has more than one root (for example two different roots both pronounced 사), each root gets a superscript number (¹ ² …) automatically. Creating a second root tags the first one ¹ and the new one ². In a word’s breakdown, a syllable with more than one root shows a menu so you can pick the right root by its meaning.</li>
@@ -279,7 +305,7 @@ function modal(title,body,btns){
   const d=document.createElement('dialog');d.innerHTML=`<form method="dialog"><h3>${title}</h3>${body}<div class="btns"></div></form>`;
   d.querySelector('form').onsubmit=e=>e.preventDefault();
   btns.forEach(x=>{const e=document.createElement('button');e.type='button';e.textContent=x.label;e.onclick=()=>{if(x.fn&&x.fn(d)===false)return;d.close()};d.querySelector('.btns').append(e)});
-  d.addEventListener('close',()=>d.remove());document.body.append(d);d.showModal();return d}
+  d.addEventListener('close',()=>d.remove());document.body.append(d);kbDialog(d);d.showModal();return d}
 function addX(d){const w=document.createElement('div');w.className='xw';w.innerHTML='<button type="button" class="x" aria-label="Close" title="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';w.firstChild.onclick=()=>d.close();d.querySelector('form').prepend(w)}
 function outClose(d){let dn=false;d.addEventListener('mousedown',e=>{dn=e.target===d&&out(d,e)});d.addEventListener('click',e=>{if(dn&&e.target===d&&out(d,e))d.close();dn=false})}
 function out(d,e){const r=d.getBoundingClientRect();return e.clientX<r.left||e.clientX>r.right||e.clientY<r.top||e.clientY>r.bottom}
@@ -303,13 +329,13 @@ function retag(r,nt){const o=r.c+(r.t||'');
   for(const w of db.words){for(const s of w.s)if(s.c===r.c&&(s.t||'')===(r.t||''))s.t=nt;if(w.x)w.x=w.x.map(k=>k===o?r.c+nt:k)}
   const kr=db.known.roots;if(kr[o]){kr[r.c+nt]=kr[o];delete kr[o]}
   r.t=nt}
-function newRoot(c0,t0,g){const pre=parseGloss(findGloss(c0,t0,g));
+function newRoot(c0,t0,g,after){const pre=parseGloss(findGloss(c0,t0,g));
   const d=modal(c0?`No table for ${esc(c0+t0)} yet`:'New root',f('c','Syllable',c0)+'<div class="tsug" id="tsug"></div>'+mh(pre.m,pre.h),
   [{label:'Cancel'},{label:'Create table',fn:d=>{const c=v(d,'c').trim();if(!c)return false;
     let tg=t0;
     if(t0&&c===c0){if(db.roots.some(r=>r.c==c&&r.t==t0)){note('Root already exists','A root with this syllable and tag already exists.');return false}}
     else{const p=plan(c);if(p.err){note('Too many roots','A syllable can have at most nine roots.');return false}p.retag.forEach(([r,nt])=>retag(r,nt));tg=p.t}
-    db.roots.push({c,t:tg,m:v(d,'m').trim(),h:v(d,'h').trim()});changed();open(db.roots.length-1)}}]);
+    db.roots.push({c,t:tg,m:v(d,'m').trim(),h:v(d,'h').trim()});changed();open(db.roots.length-1);if(after)setTimeout(after,0)}}]);
   const ci=d.querySelector('#c'),hi=d.querySelector('#h'),sg=d.querySelector('#tsug');
   const refresh=()=>{const c=ci.value.trim(),rs=c?db.roots.filter(r=>r.c===c):[],keep=t0&&c===c0;let h='';
     const list=rs.map(r=>`<li><b>${esc(rk(r))}</b>${r.h?` (${esc(r.h)})`:''}${r.m?' '+esc(r.m):''}</li>`).join('');
@@ -330,9 +356,9 @@ function editRoot(){const r=db.roots[cur],empty=!rootWords(r).length;
   modal(esc(rk(r)),mh(r.m,r.h),[
     ...(empty?[{label:'Delete root',fn:ed=>{modal('Delete this root?',`<p>${esc(rk(r))} has no words, so it will be removed.</p>`,[{label:'Cancel'},{label:'Delete',fn:()=>{removeRoot(cur);ed.close()}}]);return false}}]:[]),
     {label:'Cancel'},{label:'Save',fn:d=>{r.m=v(d,'m').trim();r.h=v(d,'h').trim();changed();render()}}])}
-function wordForm(i){
-  const r=db.roots[cur],old=i==null?null:db.words[i];let rows=old?old.s.map(s=>({...s})):[];
-  const d=modal(old?esc(old.w):'Add word',f('w','Word (Korean)',old?old.w:'')+f('m','Meaning',old?old.m:'')+'<div class="sub">Breakdown: edit the meaning of each syllable, or pick which root it belongs to</div><div id="bdx"></div>',
+function wordForm(i,pre){
+  const r=db.roots[cur],old=i==null?null:db.words[i];let rows=old?old.s.map(s=>({...s})):pre?pre.s.map(s=>({...s})):[];
+  const d=modal(old?esc(old.w):'Add word',f('w','Word (Korean)',old?old.w:pre?pre.w:'')+f('m','Meaning',old?old.m:pre?pre.m:'')+'<div class="sub">Breakdown: edit the meaning of each syllable, or pick which root it belongs to</div><div id="bdx"></div>',
   [...(old?[master?{label:'Delete',fn:ed=>{modal('Delete this word?','<p>'+esc(old.w)+' will be removed from the master list and from every table.</p>',[{label:'Cancel'},{label:'Delete',fn:()=>{db.words.splice(i,1);changed();render();ed.close()}}]);return false}}:{label:'Remove from table',fn:()=>{const k=rk(r);if(!(old.x=old.x||[]).includes(k))old.x.push(k);changed();render()}}]:[]),{label:'Cancel'},
    {label:'Save',fn:d=>{grab();const w=v(d,'w').trim();if(!w||!rows.length){note('Word needed','Enter a word that contains at least one Korean syllable.');return false}
      const ex=db.words.find((x,k)=>x.w===w&&k!==i);
@@ -433,14 +459,18 @@ let sres=[],sel=-1;
 function hideSr(){sr.style.display='none';sel=-1}
 function runSearch(){const t=q.value;if(!t.trim()){hideSr();return}
   sres=search(t);sel=-1;
-  sr.innerHTML=sres.length?sres.map((x,n)=>{const r=db.roots[x.i];
+  const kw=t.replace(/\s+/g,'');if(/^[가-힣]{1,12}$/.test(kw)&&!db.words.some(w=>w.w===kw))sres.push({k:'ext',w:kw});
+  const en=t.trim().replace(/\s+/g,' ');if(en.length>1&&/^[a-z][a-z\s'’\-]*$/i.test(en)){const lo=en.toLowerCase(),re=new RegExp('(^|[^a-z])'+lo.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'($|[^a-z])');
+    if(!db.words.some(w=>re.test(String(w.m||'').toLowerCase())||loose(roman(w.w))===loose(en)))sres.push({k:'tr',w:en})}
+  sr.innerHTML=sres.length?sres.map((x,n)=>{if(x.k=='tr')return `<button class="sri lk" data-n="${n}"><b>“${esc(x.w)}”</b><small>not in your list</small><span class="tg">Translate to Korean ↗</span></button>`;if(x.k=='ext')return `<button class="sri lk" data-n="${n}"><b>${esc(x.w)}</b><small>not in your list</small><span class="tg">Look up its roots ↗</span></button>`;const r=db.roots[x.i];
     if(x.k=='root')return `<button class="sri" data-n="${n}"><b>${esc(rk(r))}</b><small>${esc(roman(r.c))}</small><small>${esc(r.m)}${r.h?` (${esc(r.h)})`:''}</small><span class="tg">root</span></button>`;
     const w=db.words[x.j];
     return `<button class="sri" data-n="${n}"><b>${esc(w.w)}</b><small>${esc(roman(w.w))}</small><small>${esc(w.m)}</small><span class="tg">in ${esc(rk(r))}</span></button>`}).join(''):'<div class="sre">No matches</div>';
   sr.style.display='block'}
 function pick(n){const x=sres[n];if(!x)return;
+  if(x.k=='ext'||x.k=='tr'){hideSr();q.value='';q.blur();return x.k=='tr'?lookupEn(x.w):lookup(x.w)}
   hideSr();q.value='';q.blur();master=false;hist=[];cur=x.i;render();scrollTo(0,0);
-  if(x.k=='word'){const wv=db.words[x.j].w,tr=[...$('#main tbody').children].find(e=>e.firstElementChild.dataset.w===wv);if(tr){tr.classList.add('hit');tr.scrollIntoView({block:'center'})}}}
+  if(x.k=='word'){const wv=db.words[x.j].w,tr=[...$('#main tbody').children].find(e=>{const c=e.querySelector('td.wd');return c&&c.dataset.w===wv});if(tr){tr.classList.add('hit');tr.scrollIntoView({block:'center'})}}}
 q.addEventListener('input',runSearch);
 q.addEventListener('focus',()=>{if(q.value.trim())runSearch()});
 q.addEventListener('keydown',e=>{
@@ -451,6 +481,91 @@ q.addEventListener('keydown',e=>{
 sr.addEventListener('mousedown',e=>e.preventDefault());
 sr.addEventListener('click',e=>{const b=e.target.closest('.sri');if(b)pick(+b.dataset.n)});
 document.addEventListener('click',e=>{if(!e.target.closest('#sw'))hideSr()});
+// external lookup: word hanja and syllable meanings from Wiktionary (its API allows cross-site requests)
+const HJR=/[㐀-鿿豈-﫿]+/g,wkCache=new Map();
+const clip=(s,n)=>{s=String(s||'').split(';')[0].replace(/\s+/g,' ').trim().replace(/[,.:]$/,'');return s.length>n?s.slice(0,n-1)+'…':s};
+function wkDoc(t){if(!wkCache.has(t))wkCache.set(t,fetch('https://en.wiktionary.org/api/rest_v1/page/html/'+encodeURIComponent(t))
+  .then(r=>{if(r.status===404)return null;if(!r.ok)throw new Error('HTTP '+r.status);return r.text()})
+  .then(h=>h==null?null:new DOMParser().parseFromString(h,'text/html'))
+  .catch(e=>{wkCache.delete(t);throw e}));return wkCache.get(t)}
+function wkPage(t){return wkDoc(t).then(doc=>{if(!doc)return null;const hd=doc.getElementById('Korean');return hd?(hd.closest('section')||doc.body):null})}
+// Returns {h:[hanja spellings], m:first definition} for a Hangul word, or null if Wiktionary has no Korean entry
+async function wkWord(w){const sec=await wkPage(w);if(!sec)return null;const n=[...w].length,h=[];
+  for(const p of sec.querySelectorAll('p'))for(const m of p.textContent.matchAll(HJR))if([...m[0]].length===n&&!h.includes(m[0]))h.push(m[0]);
+  let m='';const li=sec.querySelector('ol>li');if(li){const k=li.cloneNode(true);k.querySelectorAll('dl,ul,ol,sup,.HQToggle').forEach(e=>e.remove());m=k.textContent}
+  return{h:h.slice(0,6),m:clip(m,60)}}
+// Looks up one hanja on its Hangul syllable's page ("學: learn (eumhun reading: 배울 학 …)")
+async function wkSyl(c,hj){if(!hj)return null;const sec=await wkPage(c);if(!sec)return null;
+  for(const li of sec.querySelectorAll('li')){const t=li.textContent.replace(/\s+/g,' ').trim();if(!t.startsWith(hj))continue;
+    const m=t.slice(hj.length).match(/^\s*[:：]\s*(.*?)\s*(?:\((?:eumhun|MC)\b|$)/);if(!m)continue;
+    const e=t.match(/eumhun reading:\s*([^()]+?)\s*\(/);return{m:clip(m[1],40),e:e?e[1].trim():''}}
+  return null}
+// English → Korean: the Korean lines of Wiktionary's translation tables, grouped by sense
+function koTrans(doc){const out=[];
+  for(const li of doc.querySelectorAll('li')){if(!/^Korean\s*:/.test(li.textContent.trim()))continue;
+    const box=li.closest('.NavFrame,details')||li.closest('.translations');
+    let gl=box?(box.getAttribute('data-gloss')||((box.querySelector('.NavHead,summary')||{}).textContent)||''):'';
+    gl=gl.replace(/[▼▲]/g,'').replace(/\s+/g,' ').trim();
+    const items=[];
+    for(const sp of li.querySelectorAll('[lang|="ko"],.tr')){const x=sp.textContent.replace(/\s+/g,' ').trim();if(!x)continue;
+      const last=items[items.length-1];
+      if(sp.classList.contains('tr')){if(last&&!last.r)last.r=x}
+      else if(/[가-힣]/.test(x)){if(!items.some(i=>i.w===x))items.push({w:x,r:'',h:''})}
+      else if(/^[㐀-鿿豈-﫿]+$/.test(x)&&last&&!last.h)last.h=x}
+    if(!items.length)continue;items.forEach(i=>{if(!i.r)i.r=roman(i.w)});
+    const g=out.find(o=>o.gl===gl);if(g){for(const i of items)if(!g.items.some(x=>x.w===i.w))g.items.push(i)}else out.push({gl,items})}
+  return out.slice(0,10)}
+// Big entries keep their translations on a "/translations" subpage
+async function enKo(term){for(const t of [...new Set([term.toLowerCase(),term])]){const doc=await wkDoc(t);if(!doc)continue;
+    let g=koTrans(doc);if(g.length)return g;const sub=await wkDoc(t+'/translations');if(sub&&(g=koTrans(sub)).length)return g}
+  return[]}
+function goWord(w){const o=db.words.find(x=>x.w===w),i=o?db.roots.findIndex(r=>shown(o,r)):-1;
+  if(i<0){master=true;hist=[];mf={q:w,s:'all',t:''};render();scrollTo(0,0);return}
+  master=false;hist=[];cur=i;render();scrollTo(0,0);
+  const tr=[...$('#main tbody').children].find(e=>{const c=e.querySelector('td.wd');return c&&c.dataset.w===w});if(tr){tr.classList.add('hit');tr.scrollIntoView({block:'center'})}}
+function lookupEn(term){const T=encodeURIComponent(term),L=(u,n)=>`<a href="${u}" target="_blank" rel="noopener">${n}</a>`;
+  const d=modal(`“${esc(term)}” in Korean`,`<div class="sub" style="margin-top:0">Translations from Wiktionary</div><div id="enb"><p class="sub">Looking up…</p></div><div class="lkl">Open in ${L('https://en.dict.naver.com/#/search?query='+T,'Naver Korean–English')} · ${L('https://papago.naver.com/?sk=en&tk=ko&st='+T,'Papago')} · ${L('https://translate.google.com/?sl=en&tl=ko&text='+T,'Google Translate')} · ${L('https://en.wiktionary.org/wiki/'+T+'#Translations','Wiktionary')}</div>`,[{label:'Close'}]);
+  addX(d);outClose(d);d.querySelector('.x').focus();const box=d.querySelector('#enb');
+  enKo(term).then(gs=>{if(!d.open)return;
+    if(!gs.length){box.innerHTML=`<p class="sub">Wiktionary has no Korean translation for “${esc(term)}”. Try the links below.</p>`;return}
+    box.innerHTML=gs.map(g=>(g.gl?`<h4 class="sec enh">${esc(g.gl)}</h4>`:'')+g.items.map(it=>{const k=it.w.replace(/\s+/g,''),have=db.words.some(x=>x.w===k),ok=/^[가-힣]+$/.test(k);
+      return `<div class="enr">${spBtn(it.w)}<b>${esc(it.w)}</b><span><small>${esc(it.r)}</small>${it.h?`<span class="lh">${esc(it.h)}</span>`:''}</span>${have?`<button type="button" class="enx" data-o="${esc(k)}">Open in list</button>`:ok?`<button type="button" class="enx" data-l="${esc(k)}" title="See its roots and add it">Roots ↗</button>`:'<span></span>'}</div>`}).join('')).join('')+
+      '<p class="sub">Tap <b>Roots ↗</b> to see a word’s hanja breakdown and add it to your list.</p>';
+    box.querySelectorAll('.sp').forEach(b=>b.onclick=()=>speak(b.dataset.say,b));
+    box.querySelectorAll('.enx').forEach(b=>b.onclick=()=>{d.close();b.dataset.o?goWord(b.dataset.o):lookup(b.dataset.l)})})
+  .catch(e=>{if(d.open)box.innerHTML=`<p class="sub">Couldn’t reach Wiktionary (${esc(e.message)}). Check your connection, or use the links below.</p>`})}
+function lookup(w){const W=encodeURIComponent(w),ch=[...w],L=(u,n)=>`<a href="${u}" target="_blank" rel="noopener">${n}</a>`;
+  const d=modal(esc(w),`<div class="sub" style="margin-top:0">Root breakdown from Wiktionary</div><div id="lkb"><p class="sub">Looking up…</p></div><div class="lkl">Open in ${L('https://en.wiktionary.org/wiki/'+W,'Wiktionary')} · ${L('https://hanja.dict.naver.com/#/search?query='+W,'Naver Hanja')} · ${L('https://en.dict.naver.com/#/search?query='+W,'Naver Korean–English')}</div>`,
+    [{label:'Close'},{label:'Add to my list',fn:()=>add()}]);
+  addX(d);outClose(d);d.querySelector('.x').focus();
+  const box=d.querySelector('#lkb'),addB=d.querySelector('.btns button:last-child');addB.disabled=true;
+  let info=null,hi=0,rows=[],tok=0,msg0='';
+  // Which of your roots this syllable belongs to: the one with the same hanja, or the only one if it has no hanja to compare
+  const fit=(c,h)=>{const rs=findRoots(c);return rs.find(r=>h&&r.h&&r.h.includes(h))||(rs.length===1&&(!h||!rs[0].h)?rs[0]:null)};
+  const gl=x=>x.h?(x.m?`${x.m} (${x.h})`:x.h):'';
+  const host=()=>{const x=rows.find(x=>x.r);return x?x.r:null};
+  function paint(msg){const hs=host();addB.disabled=!hs;addB.title=hs?'Add to the '+rk(hs)+' table':'Create a root for one of its syllables first';
+    box.innerHTML=(info&&info.m?`<p class="lkm">${esc(info.m)}</p>`:'')+(msg?`<p class="sub">${msg}</p>`:'')+
+      (info&&info.h.length>1?`<label>Wiktionary lists several hanja spellings<select id="lkh">${info.h.map((h,k)=>`<option value="${k}"${k===hi?' selected':''}>${esc(h)}</option>`).join('')}</select></label>`:'')+
+      rows.map((x,k)=>{const rs=findRoots(x.c),oth=!x.r&&rs.length?`Your ${rs.map(r=>rk(r)+(r.h?' ('+r.h+')':'')).join(', ')} ${rs.length>1?'use':'uses'} other hanja`:'';
+        return `<div class="lkr"><b>${esc(x.c)}</b><span class="lh">${esc(x.h||'—')}</span><span>${x.m?esc(x.m):x.h?'<i class="g">meaning not found</i>':''}${x.e?`<small>${esc(x.e)}</small>`:''}${oth?`<small class="warn">${esc(oth)}</small>`:''}</span><button type="button" data-k="${k}">${x.r?'Open '+esc(rk(x.r)):'+ New root'}</button></div>`}).join('')+
+      (hs?'':'<p class="sub">To add this word, first create a root for one of its syllables.</p>');
+    box.querySelectorAll('.lkr button').forEach(b=>b.onclick=()=>{const x=rows[+b.dataset.k];d.close();
+      if(x.r){master=false;hist=[];cur=db.roots.indexOf(x.r);render();scrollTo(0,0)}else newRoot(x.c,'',gl(x),()=>lookup(w))});
+    const sel=box.querySelector('#lkh');if(sel)sel.onchange=()=>{hi=+sel.value;fill()}}
+  async function fill(){const my=++tok,hj=info&&info.h.length?[...info.h[hi]]:[];
+    rows=ch.map((c,k)=>({c,h:hj[k]||'',m:'',e:'',r:fit(c,hj[k]||'')}));
+    if(!hj.length)return paint(msg0);
+    paint('Looking up syllable meanings…');
+    const got=await Promise.all(ch.map((c,k)=>wkSyl(c,hj[k]).catch(()=>null)));if(my!==tok||!d.open)return;
+    got.forEach((g,k)=>{if(g){rows[k].m=g.m;rows[k].e=g.e}});paint('')}
+  function add(){const hs=host();if(!hs)return false;
+    if(db.words.some(x=>x.w===w)){note('Word already exists',esc(w)+' is already in the master list.');return false}
+    const pre={w,m:info&&info.m||'',s:rows.map(x=>({c:x.c,t:x.r?x.r.t:'',g:x.r&&x.h&&x.r.h&&x.r.h.includes(x.h)?'':gl(x)}))};
+    master=false;hist=[];cur=db.roots.indexOf(hs);render();scrollTo(0,0);setTimeout(()=>wordForm(null,pre),0)}
+  wkWord(w).then(i=>{if(!d.open)return;info=i;
+      msg0=!i?`Wiktionary has no Korean entry for ${esc(w)}. Try the links below.`:!i.h.length?`Wiktionary lists no hanja for ${esc(w)}, so it is probably a native Korean word or a loanword.`:'';fill()})
+    .catch(e=>{if(!d.open)return;msg0=`Couldn’t reach Wiktionary (${esc(e.message)}). Check your connection, or use the links below.`;fill()})}
 // export / import
 let fh=null;
 const fnEl={value:'KRoots.'+new Date().toLocaleDateString('sv')};const base=n=>n.replace(/\.json$/i,'');
@@ -508,6 +623,53 @@ $('#load').onclick=()=>{
     if(mode==='replace'){fh=null;fnEl.value=base(fl.name)}const rd=new FileReader();rd.onload=()=>loadText(rd.result,mode);rd.readAsText(fl)};
   d.querySelector('#u').addEventListener('keydown',e=>{if(e.key=='Enter'){e.preventDefault();go(d)}})};
 $('#file').onchange=e=>{const fl=e.target.files[0];if(!fl)return;fh=null;if(impMode==='replace')fnEl.value=base(fl.name);const rd=new FileReader();rd.onload=()=>loadText(rd.result,impMode);rd.readAsText(fl);e.target.value=''};
+// On-screen Korean keyboard (standard 2-set layout) for mouse entry on desktop
+const KCH=[...'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ'],KJU=[...'ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ'],KJO=['',...'ㄱㄲㄳㄴㄵㄶㄷㄹㄺㄻㄼㄽㄾㄿㅀㅁㅂㅄㅅㅆㅇㅈㅊㅋㅌㅍㅎ'];
+const VV={'ㅗㅏ':'ㅘ','ㅗㅐ':'ㅙ','ㅗㅣ':'ㅚ','ㅜㅓ':'ㅝ','ㅜㅔ':'ㅞ','ㅜㅣ':'ㅟ','ㅡㅣ':'ㅢ'},JJ={'ㄱㅅ':'ㄳ','ㄴㅈ':'ㄵ','ㄴㅎ':'ㄶ','ㄹㄱ':'ㄺ','ㄹㅁ':'ㄻ','ㄹㅂ':'ㄼ','ㄹㅅ':'ㄽ','ㄹㅌ':'ㄾ','ㄹㅍ':'ㄿ','ㄹㅎ':'ㅀ','ㅂㅅ':'ㅄ'};
+const flip=m=>Object.fromEntries(Object.entries(m).map(([a,b])=>[b,a])),VVr=flip(VV),JJr=flip(JJ);
+const hDec=ch=>{const n=(ch||'').charCodeAt(0)-0xAC00;return n>=0&&n<=11171?{c:KCH[Math.floor(n/588)],v:KJU[Math.floor(n/28)%21],j:KJO[n%28]}:null};
+const hCom=(c,v,j='')=>String.fromCharCode(0xAC00+(KCH.indexOf(c)*21+KJU.indexOf(v))*28+KJO.indexOf(j));
+// Combine the last character L with a newly typed letter k; returns the replacement text
+function hAdd(L,k){const s=hDec(L);
+  if(!KJU.includes(k)){if(s&&!s.j&&KJO.includes(k))return hCom(s.c,s.v,k);if(s&&s.j&&JJ[s.j+k])return hCom(s.c,s.v,JJ[s.j+k]);return L+k}
+  if(s&&s.j){const p=JJr[s.j];return p?hCom(s.c,s.v,p[0])+hCom(p[1],k):hCom(s.c,s.v)+hCom(s.j,k)}
+  if(s&&VV[s.v+k])return hCom(s.c,VV[s.v+k]);
+  if(KCH.includes(L))return hCom(L,k);
+  if(VV[L+k])return VV[L+k];
+  return L+k}
+// Take the last letter back out of a syllable (한 → 하 → ㅎ)
+function hBack(L){const s=hDec(L);
+  if(s){if(s.j){const p=JJr[s.j];return hCom(s.c,s.v,p?p[0]:'')}const p=VVr[s.v];return p?hCom(s.c,p[0]):s.c}
+  const p=VVr[L];return p?p[0]:''}
+const KRW=[['qㅂㅃ','wㅈㅉ','eㄷㄸ','rㄱㄲ','tㅅㅆ','yㅛ','uㅕ','iㅑ','oㅐㅒ','pㅔㅖ'],['aㅁ','sㄴ','dㅇ','fㄹ','gㅎ','hㅗ','jㅓ','kㅏ','lㅣ'],['zㅋ','xㅌ','cㅊ','vㅍ','bㅠ','nㅜ','mㅡ']];
+const kbKeys=sh=>KRW.map((r,i)=>`<div class="kr">${i==2?`<button type="button" class="kx ksh${sh?' on':''}" data-a="sh" aria-pressed="${sh}">⇧ Shift</button>`:''}${r.map(x=>{const k=sh&&x[2]?x[2]:x[1];return `<button type="button" data-k="${k}" aria-label="${k}">${k}<small>${x[0]}</small></button>`}).join('')}${i==2?'<button type="button" class="kx" data-a="bs" title="Backspace" aria-label="Backspace">⌫</button>':''}</div>`).join('')+'<div class="kr"><button type="button" class="kx" data-a="clr">Clear</button><button type="button" class="ksp" data-a="sp">Space</button></div>';
+const KBK='kr_kbd_v1',kbFine=()=>matchMedia('(hover:hover) and (pointer:fine) and (min-width:701px)').matches;
+let kbOn=false;try{kbOn=localStorage.getItem(KBK)==='1'}catch(e){}
+function kbShift(p,on){p.classList.toggle('sh',on);p.querySelector('.kbk').innerHTML=kbKeys(on)}
+function setKb(on,quiet){kbOn=on;try{localStorage.setItem(KBK,on?'1':'0')}catch(e){}document.body.classList.toggle('kbon',on);
+  const b=$('#kbt');b.classList.toggle('on',on);b.setAttribute('aria-pressed',on);if(on&&!quiet&&!document.querySelector('dialog'))$('#q').focus()}
+function kbDialog(d){if(!kbOn||!kbFine()||!d.querySelector('#w,#c'))return;
+  const p=document.createElement('div');p.className='kbd';p.setAttribute('role','group');p.setAttribute('aria-label','Korean keyboard');p.innerHTML='<div class="kbk">'+kbKeys(false)+'</div>';
+  const bt=d.querySelector('.btns');bt?bt.before(p):d.querySelector('form').append(p)}
+$('#kbm').innerHTML='<div class="kbh"><span>Korean keyboard</span><button type="button" data-a="close" title="Close keyboard" aria-label="Close keyboard">×</button></div><div class="kbk">'+kbKeys(false)+'</div>';
+const isTxt=el=>el&&el.tagName==='INPUT'&&/^(text|search)$/.test(el.type)&&!el.closest('.kbd');
+function kbTarget(p){if(p._t&&p._t.isConnected)return p._t;const d=p.closest('dialog');return d?d.querySelector('#w,#c'):$('#q')}
+function kbEdit(t,fn){const a=t.selectionStart??t.value.length,b=t.selectionEnd??a,pre=t.value.slice(0,a),post=t.value.slice(b),np=fn(pre,a===b);
+  t.value=np+post;t.setSelectionRange(np.length,np.length);t.dispatchEvent(new Event('input',{bubbles:true}))}
+document.addEventListener('focusin',e=>{const t=e.target;if(!isTxt(t))return;const d=t.closest('dialog'),p=d?d.querySelector('.kbd'):$('#kbm');if(p)p._t=t});
+document.addEventListener('keydown',e=>{if(isTxt(e.target))e.target._comp=false},true);
+document.addEventListener('mousedown',e=>{if(e.target.closest('.kbd button'))e.preventDefault();else if(isTxt(e.target))e.target._comp=false},true);
+document.addEventListener('click',e=>{if(e.target.closest('#kbt'))return setKb(!kbOn);
+  const b=e.target.closest('.kbd button');if(!b)return;const p=b.closest('.kbd'),a=b.dataset.a;
+  if(a==='close')return setKb(false);
+  if(a==='sh')return kbShift(p,!p.classList.contains('sh'));
+  const t=kbTarget(p);if(!t)return;
+  if(document.activeElement!==t){t.focus();t.setSelectionRange(t.value.length,t.value.length);t._comp=false}
+  if(b.dataset.k){const k=b.dataset.k;kbEdit(t,(pre,col)=>t._comp&&col?pre.slice(0,-1)+hAdd(pre.slice(-1),k):pre+k);t._comp=true;if(p.classList.contains('sh'))kbShift(p,false)}
+  else if(a==='bs')kbEdit(t,(pre,col)=>col?pre.slice(0,-1)+(t._comp?hBack(pre.slice(-1)):''):pre);
+  else if(a==='sp'){kbEdit(t,pre=>pre+' ');t._comp=false}
+  else if(a==='clr'){t._comp=false;t.value='';t.dispatchEvent(new Event('input',{bubbles:true}))}});
+setKb(kbOn,true);
 onbeforeunload=e=>{if(dirty){e.preventDefault();e.returnValue=''}};
 render();
 if(tagFix.length)try{localStorage.setItem(LS,JSON.stringify(db))}catch(e){}
