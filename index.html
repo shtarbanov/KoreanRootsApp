@@ -6,7 +6,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Korean Roots vocabulary</title>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#1f4e9c">
+<meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#17181a" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="K-Roots">
@@ -15,7 +17,10 @@
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
-<script>try{var t=localStorage.getItem('kr_theme_v1');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}</script>
+<script>try{var t=localStorage.getItem('kr_theme_v1');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}
+// Status and navigation bars of the installed app take this color, so keep it the same as the page background
+function syncBar(){var c=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();if(!c)return;document.querySelectorAll('meta[name=theme-color]').forEach(function(m){m.content=c;m.removeAttribute('media')})}
+document.addEventListener('DOMContentLoaded',syncBar);try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',syncBar)}catch(e){}</script>
 <style>
 :root{--bg:#fafaf7;--card:#fff;--fg:#1d1d1b;--mut:#6b6b66;--line:#e1e0d8;--acc:#1f4e9c;--kn:#fff59d;--knfg:#946f00;--no:#c9722b;--inp:#fff;--ph:#8a8a84;--bd:#9a9a94;color-scheme:light}
 :root[data-theme="dark"]{--bg:#17181a;--card:#202225;--fg:#ececea;--mut:#9a9a94;--line:#34363a;--acc:#7aa7f0;--kn:#5c4f10;--knfg:#ffe14d;--no:#e5a066;--inp:#2b2e33;--ph:#b5b5ae;--bd:#6a6e76;color-scheme:dark}
@@ -180,7 +185,7 @@ const $=s=>document.querySelector(s);
 let tt;function toast(m){let e=$('#toast');if(!e){e=document.createElement('div');e.id='toast';e.setAttribute('role','status');e.setAttribute('aria-live','polite');document.body.append(e)}
   e.textContent=m;void e.offsetWidth;e.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>e.classList.remove('show'),2200)}
 const TK='kr_theme_v1';let theme='system';try{theme=localStorage.getItem(TK)||'system'}catch(e){}
-function setTheme(t){theme=t;const r=document.documentElement;t==='light'||t==='dark'?r.dataset.theme=t:delete r.dataset.theme;try{localStorage.setItem(TK,t)}catch(e){}}
+function setTheme(t){theme=t;const r=document.documentElement;t==='light'||t==='dark'?r.dataset.theme=t:delete r.dataset.theme;try{localStorage.setItem(TK,t)}catch(e){}syncBar()}
 const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const LS='kr_roots_db_v1';
 let db,cur=0,hist=[],dirty=false,ct,master=false,mf={q:'',s:'all',t:''};
@@ -263,7 +268,7 @@ document.addEventListener('input',e=>{if(e.target.id==='mq'){mf.q=e.target.value
 document.addEventListener('change',e=>{const t=e.target;if(t.id==='ms'){mf.s=t.value;fillMaster()}else if(t.id==='mt'){mf.t=t.value;fillMaster()}else return;if(matchMedia('(hover:none)').matches)t.blur()});
 function open(i){master=false;if(i!==cur){hist.push(cur);cur=i}render();scrollTo(0,0)}
 function offerNew(c,t,g){const k=c+(t||'');
-  modal('Create a table?',`<p>There is no table for <b>${esc(k)}</b> yet. Do you want to create one?</p>`,[{label:'Cancel'},{label:'Create table',fn:()=>{setTimeout(()=>newRoot(c,t,g),0)}}])}
+  addX(modal('Create a table?',`<p>There is no table for <b>${esc(k)}</b> yet. Do you want to create one?</p>`,[{label:'Cancel'},{label:'Create table',fn:()=>{setTimeout(()=>newRoot(c,t,g),0)}}]))}
 function go(el){const c=el.dataset.c,t=el.dataset.t,g=el.dataset.g;
   if(t){const i=db.roots.findIndex(r=>r.c==c&&r.t==t);return i<0?offerNew(c,t,g):open(i)}
   const l=db.roots.map((r,i)=>[r,i]).filter(x=>x[0].c==c);
@@ -335,7 +340,7 @@ function newRoot(c0,t0,g,after){const pre=parseGloss(findGloss(c0,t0,g));
     let tg=t0;
     if(t0&&c===c0){if(db.roots.some(r=>r.c==c&&r.t==t0)){note('Root already exists','A root with this syllable and tag already exists.');return false}}
     else{const p=plan(c);if(p.err){note('Too many roots','A syllable can have at most nine roots.');return false}p.retag.forEach(([r,nt])=>retag(r,nt));tg=p.t}
-    db.roots.push({c,t:tg,m:v(d,'m').trim(),h:v(d,'h').trim()});changed();open(db.roots.length-1);if(after)setTimeout(after,0)}}]);
+    db.roots.push({c,t:tg,m:v(d,'m').trim(),h:v(d,'h').trim()});changed();open(db.roots.length-1);if(after)setTimeout(after,0)}}]);addX(d);
   const ci=d.querySelector('#c'),hi=d.querySelector('#h'),sg=d.querySelector('#tsug');
   const refresh=()=>{const c=ci.value.trim(),rs=c?db.roots.filter(r=>r.c===c):[],keep=t0&&c===c0;let h='';
     const list=rs.map(r=>`<li><b>${esc(rk(r))}</b>${r.h?` (${esc(r.h)})`:''}${r.m?' '+esc(r.m):''}</li>`).join('');
