@@ -1,5 +1,5 @@
 // Bump CACHE when you update the app so installed copies refresh.
-const CACHE = 'koreanroots-v21';
+const CACHE = 'koreanroots-v22';
 const ASSETS = ['./', './index.html', './manifest.webmanifest',
   './icons/icon-192.png', './icons/icon-512.png',
   './icons/icon-maskable-512.png', './icons/apple-touch-icon.png',
