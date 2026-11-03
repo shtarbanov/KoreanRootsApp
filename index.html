@@ -277,7 +277,7 @@ document.addEventListener('input',e=>{if(e.target.id==='mq'){mf.q=e.target.value
 document.addEventListener('change',e=>{const t=e.target;if(t.id==='ms'){mf.s=t.value;fillMaster()}else if(t.id==='mt'){mf.t=t.value;fillMaster()}else return;if(matchMedia('(hover:none)').matches)t.blur()});
 function open(i){master=false;if(i!==cur){hist.push(cur);cur=i}render();scrollTo(0,0)}
 function offerNew(c,t,g){const k=c+(t||'');
-  addX(modal('Create a table?',`<p>There is no table for <b>${esc(k)}</b> yet. Do you want to create one?</p>`,[{label:'Cancel'},{label:'Create table',fn:()=>{setTimeout(()=>newRoot(c,t,g),0)}}]))}
+  addX(modal(`Create a ${esc(k)} table?`,'',[{label:'Cancel'},{label:'Create table',fn:()=>{setTimeout(()=>newRoot(c,t,g),0)}}]))}
 function go(el){const c=el.dataset.c,t=el.dataset.t,g=el.dataset.g;
   if(t){const i=db.roots.findIndex(r=>r.c==c&&r.t==t);return i<0?offerNew(c,t,g):open(i)}
   const l=db.roots.map((r,i)=>[r,i]).filter(x=>x[0].c==c);
