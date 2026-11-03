@@ -104,6 +104,7 @@ h4.sec.enh{margin:12px 0 0;font-size:13px;text-transform:none;letter-spacing:0}
 .ri[data-i]{touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 .ri.dg{position:fixed;z-index:30;pointer-events:none;margin:0;box-shadow:0 6px 18px #0005;background:var(--card);border-color:var(--acc);opacity:.95}
 .ri.dg.lift{transform:scale(1.1);transform-origin:50% 100%;box-shadow:0 10px 24px #0006}
+.ri.dg.out{opacity:.6;border-style:dashed}
 .ri.ph{opacity:.35;border-style:dashed;border-color:var(--acc)}
 body.dragging,body.dragging *{cursor:grabbing!important}
 .af{position:absolute;width:1px;height:1px;overflow:hidden;outline:none}
@@ -694,7 +695,8 @@ setKb(kbOn,true);
 // Drag root pills to reorder: mouse drags after a small move, touch drags after a long press (so the list still scrolls)
 (function(){const side=$('#side');let st=null,justDragged=false;
   const pills=()=>[...side.querySelectorAll('.ri[data-i]')];
-  function begin(){const b=st.el,r=b.getBoundingClientRect();st.on=true;st.dx=st.x-r.left;st.dy=st.y-r.top;
+  const restore=()=>pills().sort((a,b)=>a.dataset.i-b.dataset.i).forEach(p=>side.insertBefore(p,$('#newroot')));
+  function begin(){const b=st.el,r=b.getBoundingClientRect();st.on=true;st.out=false;st.dx=st.x-r.left;st.dy=st.y-r.top;
     const g=b.cloneNode(true);g.classList.add('dg');g.classList.remove('on');g.style.width=r.width+'px';g.style.height=r.height+'px';if(st.touch)g.classList.add('lift');document.body.append(g);st.g=g;
     b.classList.add('ph');document.body.classList.add('dragging');if(navigator.vibrate)try{navigator.vibrate(15)}catch(e){}move(st.x,st.y)}
   function move(x,y){const g=st.g;
@@ -703,6 +705,9 @@ setKb(kbOn,true);
       // Dead zone: holding still and letting go must leave the root where it was
       if(!st.moved&&Math.hypot(x-st.x,y-st.y)<10)return;st.moved=true;x=gx+w/2;y=gy+h/2}
     else{g.style.left=(x-st.dx)+'px';g.style.top=(y-st.dy)+'px'}
+    // Outside the list: put everything back where it started, so the gap shows the original spot and letting go changes nothing
+    const sr0=side.getBoundingClientRect(),M=16,out=x<sr0.left-M||x>sr0.right+M||y<sr0.top-M||y>sr0.bottom+M;
+    st.out=out;st.g.classList.toggle('out',out);if(out){restore();return}
     const b=st.el,ps=pills().filter(p=>p!==b),row=getComputedStyle(side).flexDirection==='row';
     let tgt=null,after=false;
     for(const p of ps){const r=p.getBoundingClientRect();
@@ -721,13 +726,13 @@ setKb(kbOn,true);
   addEventListener('pointermove',e=>{if(!st||e.pointerId!==st.id)return;
     if(!st.on){const d=Math.hypot(e.clientX-st.x,e.clientY-st.y);if(st.touch){if(d>8){clearTimeout(st.t);st=null}return}if(d<6)return;begin()}
     e.preventDefault();move(e.clientX,e.clientY)},{passive:false});
-  addEventListener('pointerup',e=>{if(st&&e.pointerId===st.id)end(true)});
+  addEventListener('pointerup',e=>{if(st&&e.pointerId===st.id){if(st.on&&st.out)restore();end(!st.out)}});
   addEventListener('pointercancel',e=>{if(st&&e.pointerId===st.id)end(false)});
   // While a long-press drag is active, stop the page from scrolling under the finger
   addEventListener('touchmove',e=>{if(st&&st.on)e.preventDefault()},{passive:false});
   side.addEventListener('contextmenu',e=>{if(e.target.closest('.ri[data-i]'))e.preventDefault()});
   addEventListener('click',e=>{if(justDragged){e.stopPropagation();e.preventDefault()}},true);
-  addEventListener('keydown',e=>{if(e.key==='Escape'&&st&&st.on){pills().sort((a,b)=>a.dataset.i-b.dataset.i).forEach(p=>side.insertBefore(p,$('#newroot')));end(false)}})})();
+  addEventListener('keydown',e=>{if(e.key==='Escape'&&st&&st.on){restore();end(false)}})})();
 onbeforeunload=e=>{if(dirty){e.preventDefault();e.returnValue=''}};
 render();
 if(tagFix.length)try{localStorage.setItem(LS,JSON.stringify(db))}catch(e){}
