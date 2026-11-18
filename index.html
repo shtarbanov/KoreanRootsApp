@@ -147,9 +147,10 @@ body.tfson .tview .tbar{margin:0 0 8px}
 .tree.pan,.tree.pan *{cursor:grabbing!important}
 .tn .tt{display:inline-flex;align-items:baseline;gap:5px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:15px;max-width:240px;overflow:hidden;text-overflow:ellipsis}
 .tn .tt b{font-size:17px;font-weight:600}.tn .tt small{color:var(--mut);font-size:12px;overflow:hidden;text-overflow:ellipsis}
-.tn .th{color:var(--mut);font-size:13px}.tn .tc{font-size:11px;color:var(--acc);font-weight:600}
+.tn .th{color:var(--mut);font-size:13px}
+.tn.t0 .l1{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap}.tn.t0 .l2{line-height:1.25;white-space:normal}.tn .tc{font-size:11px;color:var(--acc);font-weight:600}
 .tn.tr .tt{background:color-mix(in srgb,var(--acc) 9%,var(--card));border-color:color-mix(in srgb,var(--acc) 35%,var(--line))}
-.tn.t0 .tt{background:var(--acc);border-color:var(--acc);color:var(--card)}.tn.t0 .tt small,.tn.t0 .th{color:color-mix(in srgb,var(--card) 80%,transparent)}
+.tn.t0 .tt{flex-direction:column;align-items:flex-start;text-align:left;gap:1px;white-space:normal;max-width:150px;padding:6px 12px;background:var(--acc);border-color:var(--acc);color:var(--card)}.tn.t0 .tt small,.tn.t0 .th{color:color-mix(in srgb,var(--card) 80%,transparent)}
 .tn.tr.nat .tt{border-style:dashed}
 .tn.tw.kn .tt b,.tn.tr.kn:not(.t0) .tt b{color:var(--knfg)}
 .tn.ts .tt{border-style:dashed;background:none;color:var(--mut);cursor:default}
@@ -399,6 +400,7 @@ function drawTree(r){const box=$('#tree');if(!box)return;let fresh=!box._drawn;b
   const t=treeModel(r),flat=[];let row=0;
   (function lay(n){flat.push(n);if(n.kids.length){n.kids.forEach(lay);n.y=(n.kids[0].y+n.kids[n.kids.length-1].y)/2}else n.y=row++})(t);
   const lbl=n=>{if(n.type==='root'){const o=n.o,more=!n.open&&n.all.length;
+      if(n.depth===0)return `<button type="button" class="tt" aria-expanded="${n.open}"><span class="l1"><b>${esc(rk(o))}</b>${o.h?` <span class="th">${esc(o.h)}</span>`:''}</span>${tMean?`<small class="l2">${esc(o.m)}</small>`:''}</button>`;
       return `<button type="button" class="tt" aria-expanded="${n.open}"><b>${esc(rk(o))}</b>${o.h?` <span class="th">${esc(o.h)}</span>`:''} ${tMean?`<small>${esc(o.m)}</small>`:''}${more?` <span class="tc">+${n.all.length}</span>`:''}</button>`+(n.depth?`<button type="button" class="to" title="Open ${esc(rk(o))}" aria-label="Open ${esc(rk(o))}">↗</button>`:'')}
     if(n.type==='word')return `<button type="button" class="tt" aria-expanded="${n.open}"><b>${esc(n.o.w)}</b>${tMean?` <small>${esc(n.o.m)}</small>`:''}${!n.open&&n.all.length?` <span class="tc">+${n.all.length}</span>`:''}</button>`;
     return `<span class="tt"><b>${esc(n.o.c)}</b> ${tMean?`<small>${esc(n.o.g||'')}</small>`:hanjaOf(n.o.g)?`<span class="th">${esc(hanjaOf(n.o.g))}</span>`:''}</span>`};
