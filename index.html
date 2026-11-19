@@ -163,7 +163,7 @@ body.tfson .tframe{flex:1;min-height:0}
 .tn{position:absolute;transform:translateY(-50%);display:flex;align-items:center;white-space:nowrap}
 .tree.pan,.tree.pan *{cursor:grabbing!important}
 .tn .tt{display:inline-flex;align-items:baseline;gap:5px;padding:5px 10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:15px;max-width:240px;overflow:hidden;text-overflow:ellipsis}
-.tn .tt b{font-size:17px;font-weight:600}.tn .tt{align-items:center;line-height:1.25;min-height:34px}.tn .tt>*{line-height:1.25}.tn.t0 .tt{justify-content:center}.tn .tt small{color:var(--mut);font-size:12px;overflow:hidden;text-overflow:ellipsis}
+.tn .tt b{font-size:17px;font-weight:600}.tn .tt small{color:var(--mut);font-size:12px;overflow:hidden;text-overflow:ellipsis}
 .tn .th{color:var(--mut);font-size:13px}
 .tn.t0 .l1{display:inline-flex;align-items:baseline;gap:5px;white-space:nowrap}.tn.t0 .l2{line-height:1.25;white-space:normal}.tn .tc{font-size:11px;color:var(--acc);font-weight:600}
 .tn.tr .tt{background:color-mix(in srgb,var(--acc) 9%,var(--card));border-color:color-mix(in srgb,var(--acc) 35%,var(--line))}
@@ -220,7 +220,7 @@ dialog .sth:first-of-type{margin-top:4px;padding-top:0;border-top:0}.pn{margin:4
 @keyframes hit{from{background:var(--kn)}to{background:transparent}}
 tr.hit>td{animation:hit 2.2s ease-out}
 .ri.kn{font-weight:700}.ri.kn small{font-weight:400}
-@media (max-width:700px){#sw,#psw{padding:8px 12px 0}.tabrow{gap:8px;padding-right:10px;position:relative}.tabrow #sw{position:static}.tabrow #sr{left:12px;right:12px;width:auto;max-width:none;top:calc(100% + 4px)}.pgtabs{padding:4px 4px 0 6px;gap:0}.pgtabs button{padding:8px 9px;gap:5px}.tabrow #q,.tabrow #pq{padding:8px 8px 8px 32px;background-position:9px center}.tabrow #addphr,.tabrow #addword{display:none}.mob{display:inline-flex;align-items:center}.psp{display:none}.pcl>.sp{display:inline-flex;min-height:0;padding:4px 7px}.pcl{margin-right:10px}#sr{left:12px;right:12px}#q,#pq{padding:10px 12px 10px 38px;max-width:none}}
+@media (max-width:700px){#sw,#psw{padding:8px 12px 0}.tabrow{gap:8px;padding-right:10px;position:relative}.tabrow #sw{position:static}.tabrow #sr{left:12px;right:12px;width:auto;max-width:none;top:calc(100% + 4px)}.pgtabs{padding:4px 4px 0 6px;gap:0}.pgtabs button{padding:8px 9px;gap:5px}.tabrow #q,.tabrow #pq{padding:8px 8px 8px 32px;background-position:9px center}.tview .tframe{margin:0 -12px}.tview .tree{border-left:0;border-right:0;border-radius:0}.tview .tctr{right:8px}.tview .tctl{left:8px}.tabrow #addphr,.tabrow #addword{display:none}.mob{display:inline-flex;align-items:center}.psp{display:none}.pcl>.sp{display:inline-flex;min-height:0;padding:4px 7px}.pcl{margin-right:10px}#sr{left:12px;right:12px}#q,#pq{padding:10px 12px 10px 38px;max-width:none}}
 .sp{display:inline-flex;align-items:center;padding:3px 7px;margin-right:4px;color:var(--acc)}
 .sp.on{background:var(--kn)}
 .wd .sp{margin:0 0 0 10px;vertical-align:middle}
@@ -437,17 +437,14 @@ function fitTree(){const box=$('#tree');if(!box)return;const top=box.getBounding
   const below=matchMedia('(max-width:700px)').matches&&ft?Math.ceil(fb-box.getBoundingClientRect().bottom):78;
   const h=tFS?innerHeight-top-10:innerHeight-(top+scrollY)-below;box.style.height=Math.max(tFS?200:300,Math.floor(h))+'px';treePad(box)}
 addEventListener('resize',()=>fitTree());
-// Full screen: the tree fills the whole window (and the browser goes full screen where it can)
+// Full screen: the tree fills the whole app window (without the browser's own full screen mode, which shows an exit notice)
 const FS_ON='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg>',
   FS_OFF='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"/></svg>';
 let tFS=false;
 function setFS(on){if(tFS===on)return;tFS=on;document.body.classList.toggle('tfson',on);placeTbar();
-  try{if(on&&!document.fullscreenElement&&document.documentElement.requestFullscreen)document.documentElement.requestFullscreen().catch(()=>{});
-      if(!on&&document.fullscreenElement)document.exitFullscreen().catch(()=>{})}catch(e){}
   const b=$('#tfs');if(b){b.innerHTML=on?FS_OFF:FS_ON;b.title=b.ariaLabel=on?'Exit full screen':'Full screen';b.setAttribute('aria-pressed',on)}
   requestAnimationFrame(()=>{fitTree();const box=$('#tree');if(box&&db.roots[cur])setZoom(tZoom)})}
 document.addEventListener('click',e=>{if(e.target.closest('#tfs'))setFS(!tFS)});
-document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement&&tFS)setFS(false)});
 addEventListener('keydown',e=>{if(e.key==='Escape'&&tFS&&!document.querySelector('dialog[open]'))setFS(false)});
 function applyZoom(box){const tz=box.querySelector('.tz'),tzs=box.querySelector('.tzs');if(!tz)return;
   tz.style.width=box._W+'px';tz.style.height=box._H+'px';tz.style.transform=tZoom===1?'':`scale(${tZoom})`;
