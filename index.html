@@ -456,9 +456,9 @@ function treePad(box){const tzs=box.querySelector('.tzs');if(!tzs)return;
 // Zoom so the content under (ax,ay) stays put; without a point, keep the middle of the visible part
 function setZoom(z,ax,ay){const box=$('#tree');if(!box)return;z=Math.min(ZMAX,Math.max(ZMIN,Math.round(z*100)/100));if(z===tZoom)return;
   const br=box.getBoundingClientRect();if(ax==null){ax=br.left+box.clientWidth/2;ay=br.top+box.clientHeight/2}
-  const tr=box.querySelector('.tzs').getBoundingClientRect(),cx=(ax-tr.left)/tZoom,cy=(ay-tr.top)/tZoom;
+  const tr=box.querySelector('.tz').getBoundingClientRect(),cx=(ax-tr.left)/tZoom,cy=(ay-tr.top)/tZoom;
   tZoom=z;try{localStorage.setItem('kr_tzoom',String(z))}catch(e){}applyZoom(box);
-  const tr2=box.querySelector('.tzs').getBoundingClientRect();box.scrollLeft+=tr2.left+cx*z-ax;box.scrollTop+=tr2.top+cy*z-ay}
+  const tr2=box.querySelector('.tz').getBoundingClientRect();box.scrollLeft+=tr2.left+cx*z-ax;box.scrollTop+=tr2.top+cy*z-ay}
 // Reset view: 100% zoom with the starting root back at the left edge, centred top to bottom
 function treeHome(){const box=$('#tree'),t0=box&&box.querySelector('.t0');if(!t0)return;const b=box.getBoundingClientRect(),r=t0.getBoundingClientRect();
   box.scrollLeft+=r.left-b.left-10;box.scrollTop+=r.top+r.height/2-(b.top+box.clientTop+box.clientHeight/2)}
