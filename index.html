@@ -126,6 +126,7 @@ body.dragging,body.dragging *{cursor:grabbing!important}
 @media (max-width:700px){.vbar button{width:36px;padding:4px 0}.vbar svg{width:13px;height:13px}.top>h2{flex:1 1 0;min-width:0}}
 .vbar button.on{color:var(--fg)}
 .vbar button:not(.on):hover{color:var(--fg)}
+.vbar{background:none;box-shadow:none;padding:0;border-radius:0;gap:2px;align-self:stretch;align-items:flex-end}.vbar::before{display:none}.vbar button,.vbar button[data-view]{width:auto;display:inline-flex;align-items:center;gap:5px;padding:5px 8px;border-radius:0;font-size:14px;border-bottom:2px solid transparent}.vbar button.on{color:var(--fg);font-weight:600;border-bottom-color:var(--acc)}.vbar svg{width:15px;height:15px}
 .tbar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:-4px 0 6px}
 .zlvl{flex:none;min-height:0;padding:5px 7px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;color:var(--fg)}
 @media (max-width:700px){.mtog{font-size:14px}}
@@ -407,7 +408,7 @@ document.addEventListener('change',e=>{const t=e.target;if(t.id==='ms'){mf.s=t.v
 // Table or tree view for a root's words; remembered per device. The switch sits in the title row, before the speaker
 const VICO={table:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M3 15h18M9 4v16"/></svg>',
   tree:'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="9.5" width="5" height="5" rx="1"/><rect x="16" y="3" width="6" height="4" rx="1"/><rect x="16" y="10" width="6" height="4" rx="1"/><rect x="16" y="17" width="6" height="4" rx="1"/><path d="M7 12h4M11 5v14M11 5h5M11 12h5M11 19h5"/></svg>'};
-const vbarHtml=()=>`<div class="vbar${view==='tree'?' tv':''}" role="group" aria-label="View">${[['table','Table view'],['tree','Tree view']].map(([k,n])=>`<button type="button" data-view="${k}" aria-pressed="${view===k}" class="${view===k?'on':''}" title="${n}" aria-label="${n}">${VICO[k]}</button>`).join('')}</div>`;
+const vbarHtml=()=>`<div class="vbar${view==='tree'?' tv':''}" role="group" aria-label="View">${[['table','Table view'],['tree','Tree view']].map(([k,n])=>`<button type="button" data-view="${k}" aria-pressed="${view===k}" class="${view===k?'on':''}" title="${n}" aria-label="${n}">${VICO[k]}<span>${n.split(' ')[0]}</span></button>`).join('')}</div>`;
 let view='table';try{if(localStorage.getItem('kr_view')==='tree')view='tree'}catch(e){}
 document.addEventListener('click',e=>{const b=e.target.closest('.vbar button[data-view]');if(!b||b.dataset.view===view)return;view=b.dataset.view;try{localStorage.setItem('kr_view',view)}catch(e){}
   // Slide the thumb across, then swap the content
