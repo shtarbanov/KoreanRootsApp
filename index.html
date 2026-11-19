@@ -351,17 +351,23 @@ migrate(db);
 const K=()=>db.known;
 const rk=r=>r.c+r.t;
 const findRoots=c=>db.roots.filter(r=>r.c===c);
-const inRoot=(w,r)=>w.s.some(s=>s.c===r.c&&(s.t||'')===(r.t||''));
+// A syllable whose own gloss names a different hanja than the root's (e.g. 사 寫 vs a 사 師 root) doesn't belong to that root
+const sHan=s=>(String(s.g||'').match(/[\u3400-\u9fff\uf900-\ufaff]/g)||[]).join('');
+// A blank meaning means "same as the root"; a meaning written without hanja (a native Korean syllable) doesn't belong to a hanja root
+const hjMis=(s,r)=>{const a=sHan(s),h=String(r.h||'').trim();if(!h)return false;if(!a)return !!String(s.g||'').trim();return !h.includes(a)&&!a.includes(h)};
+const inRoot=(w,r)=>w.s.some(s=>s.c===r.c&&(s.t||'')===(r.t||'')&&!hjMis(s,r));
+// Give a root every syllable whose own hanja matches it
+function autoAssign(r){const h=String(r.h||'').trim();if(!h)return;for(const w of db.words)for(const s of w.s){const a=sHan(s);if(s.c===r.c&&a&&(h.includes(a)||a.includes(h)))s.t=r.t||''}}
 // A root with no hanja is native Korean; its pill gets a dashed outline
 const isNative=r=>!String(r.h||'').trim();
 const shown=(w,r)=>inRoot(w,r)&&!(w.x||[]).includes(rk(r));
 const rootWords=r=>db.words.filter(w=>shown(w,r));
-function resolve(s){if(s.t)return db.roots.find(r=>r.c===s.c&&r.t===s.t);const l=findRoots(s.c);return l.length===1?l[0]:null}
+function resolve(s){if(s.t){const r=db.roots.find(r=>r.c===s.c&&r.t===s.t);return r&&!hjMis(s,r)?r:null}const l=findRoots(s.c);return l.length===1&&!hjMis(s,l[0])?l[0]:null}
 function changed(){dirty=true;try{localStorage.setItem(LS,JSON.stringify(db))}catch(e){}status()}
 function status(){const e=$('#st');e.textContent=dirty?'Unexported changes: press the export icon':'';e.className='st'+(dirty?' d':'');const sv=$('#save');sv.classList.toggle('dirty',dirty);const l=dirty?'Export JSON (unexported changes)':'Export JSON';sv.title=l;sv.setAttribute('aria-label',l)}
 function sylSpan(s,showTag){
-  const ro=resolve(s),k=ro?rk(ro):s.c+(s.t||''),none=s.t?!ro:!findRoots(s.c).length;
-  return `<span class="syl${K().roots[k]?' kn':''}${!master&&ro&&ro===db.roots[cur]?' self':''}" data-c="${esc(s.c)}" data-t="${esc(s.t||'')}" data-g="${esc(s.g||'')}" data-k="${esc(k)}" title="${none?'No table yet':''}">${esc(s.c)}${showTag&&s.t?(/^[¹²³⁴-⁹]$/.test(s.t)?esc(s.t):`<sup>${esc(s.t)}</sup>`):''}</span>`}
+  const ro=resolve(s),k=ro?rk(ro):s.c+(s.t||''),none=!ro;
+  return `<span class="syl${ro&&K().roots[k]?' kn':''}${!master&&ro&&ro===db.roots[cur]?' self':''}" data-c="${esc(s.c)}" data-t="${esc(s.t||'')}" data-g="${esc(s.g||'')}" data-k="${esc(k)}" title="${none?'No table yet':''}">${esc(s.c)}${showTag&&s.t?(/^[¹²³⁴-⁹]$/.test(s.t)?esc(s.t):`<sup>${esc(s.t)}</sup>`):''}</span>`}
 function bd(s){const ro=resolve(s);
   const g=s.g?esc(s.g):(ro&&(ro.m||ro.h)?`<i>${esc(ro.m)}${ro.h?` (${esc(ro.h)})`:''}</i>`:'');
   return `<span class="bd">${sylSpan(s,true)} <span class="g">${g}</span></span>`}
@@ -768,11 +774,12 @@ try{let f=0;(db.phrases||[]).forEach(x=>{if(!x.g){const e=EXAMPLES.find(e=>e[0]=
 function open(i){master=false;if(i!==cur){hist.push(cur);cur=i}render();scrollTo(0,0)}
 function offerNew(c,t,g){const k=c+(t||'');
   addX(modal(`Create a ${esc(k)} table?`,'',[{label:'Cancel'},{label:'Create table',fn:()=>{setTimeout(()=>newRoot(c,t,g),0)}}]))}
-function go(el){const c=el.dataset.c,t=el.dataset.t,g=el.dataset.g;
-  if(t){const i=db.roots.findIndex(r=>r.c==c&&r.t==t);return i<0?offerNew(c,t,g):open(i)}
+function go(el){const c=el.dataset.c,t=el.dataset.t,g=el.dataset.g,sy={c,t,g};
+  if(t){const i=db.roots.findIndex(r=>r.c==c&&r.t==t);if(i<0)return offerNew(c,t,g);if(!hjMis(sy,db.roots[i]))return open(i)}
   const l=db.roots.map((r,i)=>[r,i]).filter(x=>x[0].c==c);
   if(!l.length)return offerNew(c,'',g);
-  if(l.length==1)return open(l[0][1]);
+  // Only one root, and its hanja matches: open it. Otherwise ask, with the option of a new root for this hanja
+  if(l.length==1&&!hjMis(sy,l[0][0]))return open(l[0][1]);
   const d=modal(`Which ${esc(c)}?`,l.map(([r,i])=>`<button class="pk" data-i="${i}">${esc(rk(r))} ${esc(r.m)}${r.h?` (${esc(r.h)})`:''}</button>`).join('')+`<button class="pk" data-n="1">+ New root for ${esc(c)}…</button>`,[{label:'Cancel'}]);
   d.querySelectorAll('.pk').forEach(b=>b.onclick=()=>{d.close();b.dataset.n?newRoot(c,'',g):open(+b.dataset.i)})}
 function showHelp(){
@@ -791,7 +798,7 @@ function showHelp(){
 <li><b>+ Add word</b> adds a word; a row appears for each syllable where you can set its meaning and, if a syllable has several roots, pick which one.</li>
 <li><b>✎</b> on a row edits the word. <b>Remove…</b> in that dialog asks whether to hide it from this table only or delete it everywhere.</li>
 <li>When two roots share a syllable (several 사, for example), they’re numbered automatically: 사¹, 사², …</li>
-<li>The pencil next to the root’s name edits the root (meaning, hanja); <b>+ New root</b> at the end of the list adds one. Typing a syllable that already has a root makes a second one with its own hanja and meaning (numbered, like 대¹ and 대²); the menu on a root offers this too. Right-click a root pill or the root’s title (on a computer) for that menu: open, listen, mark as learned, edit, new root with the same syllable, Google Translate.</li></ul>
+<li>The pencil next to the root’s name edits the root (meaning, hanja); <b>+ New root</b> at the end of the list adds one. Typing a syllable that already has a root makes a second one with its own hanja and meaning (numbered, like 대¹ and 대²); a word only joins a root’s table when its syllable’s hanja matches the root’s (a syllable with no meaning of its own counts as the root’s; one with a meaning but no hanja stays out of roots that have hanja), and a new root picks up the words whose hanja matches it; the menu on a root offers this too. Right-click a root pill or the root’s title (on a computer) for that menu: open, listen, mark as learned, edit, new root with the same syllable, Google Translate.</li></ul>
 <h4>Tree view</h4>
 <ul><li>The <b>table / tree</b> switch next to the root’s name changes the view. The tree starts with the root on the left, its words to the right, then each word’s other roots.</li>
 <li><b>Tap</b> a root or word to open or close its branch and follow connections from root to root; <b>↗</b> opens that root’s page.</li>
@@ -852,7 +859,7 @@ function plan(c){const rs=db.roots.filter(r=>r.c===c);if(!rs.length)return{t:'',
   if(free.length<un.length+1)return{err:true};
   return{retag:un.map((r,i)=>[r,free[i]]),t:free[un.length]}}
 function retag(r,nt){const o=r.c+(r.t||'');
-  for(const w of db.words){for(const s of w.s)if(s.c===r.c&&(s.t||'')===(r.t||''))s.t=nt;if(w.x)w.x=w.x.map(k=>k===o?r.c+nt:k)}
+  for(const w of db.words){for(const s of w.s)if(s.c===r.c&&(s.t||'')===(r.t||'')&&!hjMis(s,r))s.t=nt;if(w.x)w.x=w.x.map(k=>k===o?r.c+nt:k)}
   const kr=db.known.roots;if(kr[o]){kr[r.c+nt]=kr[o];delete kr[o]}
   r.t=nt}
 function newRoot(c0,t0,g,after,same){const pre=same?{m:'',h:''}:parseGloss(findGloss(c0,t0,g));
@@ -861,7 +868,7 @@ function newRoot(c0,t0,g,after,same){const pre=same?{m:'',h:''}:parseGloss(findG
     let tg=t0;
     if(t0&&c===c0){if(db.roots.some(r=>r.c==c&&r.t==t0)){note('Root already exists','A root with this syllable and tag already exists.');return false}}
     else{const p=plan(c);if(p.err){note('Too many roots','A syllable can have at most nine roots.');return false}p.retag.forEach(([r,nt])=>retag(r,nt));tg=p.t}
-    db.roots.push({c,t:tg,m:v(d,'m').trim(),h:v(d,'h').trim()});changed();open(db.roots.length-1);if(after)setTimeout(after,0)}}]);addX(d);
+    db.roots.push({c,t:tg,m:v(d,'m').trim(),h:v(d,'h').trim()});autoAssign(db.roots[db.roots.length-1]);changed();open(db.roots.length-1);if(after)setTimeout(after,0)}}]);addX(d);
   const ci=d.querySelector('#c'),hi=d.querySelector('#h'),sg=d.querySelector('#tsug');
   const refresh=()=>{const c=ci.value.trim(),rs=c?db.roots.filter(r=>r.c===c):[],keep=t0&&c===c0;let h='';
     const list=rs.map(r=>`<li><b>${esc(rk(r))}</b>${r.h?` (${esc(r.h)})`:''}${r.m?' '+esc(r.m):''}</li>`).join('');
@@ -881,7 +888,7 @@ function removeRoot(i){const r=db.roots[i],k=rk(r);db.roots.splice(i,1);delete d
 function editRoot(){const r=db.roots[cur],empty=!rootWords(r).length;
   modal('Edit root','<div class="row2"><label class="hj">Syllable<input value="'+esc(rk(r))+'" lang="ko" readonly tabindex="-1" class="ro" title="The syllable can’t be changed"></label>'+f('m','Meaning',r.m)+f('h','Hanja',r.h).replace('<label>','<label class="hj">')+'</div>',[
     ...(empty?[{label:'Delete root',fn:ed=>{modal('Delete this root?',`<p>${esc(rk(r))} has no words, so it will be removed.</p>`,[{label:'Cancel'},{label:'Delete',fn:()=>{removeRoot(cur);ed.close()}}]);return false}}]:[]),
-    {label:'Cancel'},{label:'Save',fn:d=>{r.m=v(d,'m').trim();r.h=v(d,'h').trim();changed();render()}}])}
+    {label:'Cancel'},{label:'Save',fn:d=>{const oh=r.h;r.m=v(d,'m').trim();r.h=v(d,'h').trim();if(r.h!==oh)autoAssign(r);changed();render()}}])}
 function wordForm(i,pre){
   const r=db.roots[cur],old=i==null?null:db.words[i];let rows=old?old.s.map(s=>({...s})):pre?pre.s.map(s=>({...s})):[];
   const d=modal(old?esc(old.w):'Add word',f('w','Word (Korean)',old?old.w:pre?pre.w:'')+f('m','Meaning',old?old.m:pre?pre.m:'')+'<div class="sub">Breakdown: edit the meaning of each syllable, or pick which root it belongs to</div><div id="bdx"></div>',
@@ -899,7 +906,7 @@ function wordForm(i,pre){
   const grab=()=>d.querySelectorAll('.bx').forEach((e,k)=>{if(rows[k]){const tc=e.querySelector('.t');if(tc)rows[k].t=tc.value.trim();rows[k].g=e.querySelector('.g').value.trim()}});
   const build=()=>{grab();const ch=[...v(d,'w')].filter(x=>/[가-힣]/.test(x));
     rows=ch.map((c,k)=>rows[k]&&rows[k].c==c?rows[k]:{c,t:c==r.c&&ch.indexOf(c)==k?r.t:'',g:''});
-    rows.forEach(s=>{const o=findRoots(s.c);if(o.length<2)s.t=o.length?o[0].t:''});
+    rows.forEach(s=>{const o=findRoots(s.c);if(o.length<2)s.t=o.length&&!hjMis(s,o[0])?o[0].t:''});
     d.querySelector('#bdx').innerHTML=rows.map(s=>{const ro=resolve(s);const opts=findRoots(s.c);
       const ctl=opts.length>1?`<select class="t" aria-label="Which ${esc(s.c)}?">${(opts.some(x=>x.t===s.t)?'':`<option value="${esc(s.t)}" selected>${s.t?esc(s.c+s.t)+' (no table)':'Choose…'}</option>`)+opts.map(x=>`<option value="${esc(x.t)}"${x.t===s.t?' selected':''}>${esc(x.c+x.t)} ${esc(x.m)}</option>`).join('')}</select>`:'';
       return `<div class="bx"><b>${esc(s.c)}</b>${ctl}<input class="g" placeholder="${esc(ro&&ro.m?ro.m:'meaning (hanja)')}" value="${esc(s.g)}"></div>`}).join('')};
