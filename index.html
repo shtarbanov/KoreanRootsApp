@@ -271,7 +271,7 @@ header{padding:8px 12px;gap:6px}header h1{font-size:16px}.st{display:none}#save{
 #load svg,#save svg,#settings svg{width:26px;height:26px}#save.dirty::after{content:'';position:absolute;top:-4px;right:-4px;width:9px;height:9px;border-radius:50%;background:var(--no);border:2px solid var(--card);box-sizing:content-box;margin:-2px -2px 0 0}
 button{min-height:38px;padding:4px 12px}
 .wrap{flex-direction:column;padding:10px 12px;gap:10px}
-aside{display:none;width:100%;flex-direction:row;flex-wrap:wrap;gap:6px}body.ro aside{display:flex}#rb,#prb{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;min-height:0;padding:0;margin-left:6px;vertical-align:middle;border:1.5px solid var(--bd);border-radius:50%;color:var(--mut);background:var(--card)}#rb[aria-expanded=true],#prb[aria-expanded=true]{border-color:var(--acc);color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--card))}#rb .cv,#prb .cv{transition:transform .2s}#rb[aria-expanded=true] .cv,#prb[aria-expanded=true] .cv{transform:rotate(180deg)}.wrap{gap:0;align-items:stretch}main{display:contents}main>*{order:3}main>.bk{order:0}main>.top{order:2}.top{min-height:38px}.wrap>aside{order:1;margin-bottom:12px}.scroll{overflow:visible}
+aside{display:none;width:100%;flex-direction:row;flex-wrap:wrap;gap:6px}body.ro aside{display:flex}body.pin aside{animation:pillsIn .2s ease-out}body.pout aside{animation:pillsOut .14s ease-in forwards}@keyframes pillsIn{from{opacity:0;transform:translateY(-10px)}}@keyframes pillsOut{to{opacity:0;transform:translateY(-10px)}}#rb,#prb{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;min-height:0;padding:0;margin-left:6px;vertical-align:middle;border:1.5px solid var(--bd);border-radius:50%;color:var(--mut);background:var(--card)}#rb[aria-expanded=true],#prb[aria-expanded=true]{border-color:var(--acc);color:var(--acc);background:color-mix(in srgb,var(--acc) 10%,var(--card))}#rb .cv,#prb .cv{transition:transform .2s}#rb[aria-expanded=true] .cv,#prb[aria-expanded=true] .cv{transform:rotate(180deg)}.wrap{gap:0;align-items:stretch}main{display:contents}main>*{order:3}main>.bk{order:0}main>.top{order:2}.top{min-height:38px}.wrap>aside{order:1;margin-bottom:12px}.scroll{overflow:visible}
 .ri{white-space:nowrap;border-color:var(--line);flex:none;font-size:17px}.ri small{display:none}.ri.add{margin-top:0;font-size:14px}.ri .mx{display:none}.ri{background:color-mix(in srgb,var(--acc) 10%,var(--bg));border-color:color-mix(in srgb,var(--acc) 35%,var(--line))}.ri.on,.ri.on.kn{background:var(--acc);border-color:var(--acc);color:var(--card)}.ri.on.kn{color:#ffe14d}@media (prefers-color-scheme:dark){:root:not([data-theme=light]) .ri.on{background:color-mix(in srgb,var(--acc) 55%,#000);color:#fff}:root:not([data-theme=light]) .ri.on.kn{color:#ffe14d}}:root[data-theme=dark] .ri.on{background:color-mix(in srgb,var(--acc) 55%,#000);color:#fff}:root[data-theme=dark] .ri.on.kn{color:#ffe14d}
 main{width:100%}h2{font-size:20px}.mm{font-size:14px}
 thead{display:none}table,tbody{display:block}
@@ -680,7 +680,7 @@ $('#phr').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)
   if(b.classList.contains('kb')){e.stopPropagation();const t=b.dataset.t,m=K()[t]=K()[t]||{},k=b.dataset.k,was=!!m[k];was?delete m[k]:m[k]=1;changed();renderPhrases();
     if(matchMedia('(max-width:700px)').matches)toast(t==='places'?k+(was?' unmarked as learned':' marked as learned ✓'):was?'Phrase unmarked as learned':'Phrase marked as learned ✓');return}
   if(b.id==='addphr'||b.id==='addphr2')return phraseForm();
-  if(b.id==='prb'){e.stopPropagation();document.body.classList.toggle('ro');return}
+  if(b.id==='prb'){e.stopPropagation();setPills(!document.body.classList.contains('ro'));return}
   if(b.id==='phex')return addExamples();
   if(b.dataset.pf!=null){pf=b.dataset.pf;return renderPhrases()}
   if(b.classList.contains('pe'))return phraseForm(+b.dataset.i);
@@ -921,7 +921,7 @@ document.addEventListener('click',e=>{const t=e.target,syl=t.closest('.syl');
   else if(b.classList.contains('kb')){const m=K()[b.dataset.t],k=b.dataset.k,y=scrollY;const was=!!m[k];was?delete m[k]:m[k]=1;changed();render();scrollTo(0,y);if(matchMedia('(max-width:700px)').matches)toast(was?k+' unmarked as learned':k+' marked as learned ✓')}
   else if(b.classList.contains('ri')&&b.dataset.i!=null){master=false;hist=[];cur=+b.dataset.i;render()}
   else if(b.id=='allwords'){master=true;hist=[];render();scrollTo(0,0)}
-  else if(b.id=='rb'){document.body.classList.toggle('ro');requestAnimationFrame(()=>fitTree())}
+  else if(b.id=='rb'){setPills(!document.body.classList.contains('ro'))}
   else if(b.id=='help')showHelp();
   else if(b.id=='settings')voiceSettings();
   else if(b.id=='newroot'){newRoot('','')}
@@ -1269,6 +1269,18 @@ pillDrag({side:'#pside',pill:'.ri[data-pi]',key:p=>+p.dataset.pi,anchor:sd=>sd.q
   commit:order=>{const pl=phPlaces();db.placeOrder=order.map(k=>pl[k]);changed()}});
 
 document.addEventListener('contextmenu',e=>{const h=e.target.closest('#main .top h2');if(!h||master||page!=='roots'||e.target.closest('button'))return;e.preventDefault();rootMenu(cur,e.clientX,e.clientY)});
+// Show or hide the pills (phone): the arrow button, or a swipe — up on the pills or the title row hides them, down on the title row shows them
+function setPills(on){const bd=document.body;if(bd.classList.contains('ro')===on)return;clearTimeout(setPills.t);
+  if(on){bd.classList.add('ro','pin');setPills.t=setTimeout(()=>bd.classList.remove('pin'),220)}
+  else{bd.classList.add('pout');setPills.t=setTimeout(()=>{bd.classList.remove('ro','pout');syncRb();fitTree()},140)}
+  syncRb();requestAnimationFrame(()=>fitTree())}
+{let sw=null;const phone=()=>matchMedia('(max-width:700px)').matches;
+ addEventListener('touchstart',e=>{sw=null;if(e.touches.length!==1||!phone())return;const t=e.target,onP=t.closest&&t.closest('#side,#pside'),onT=t.closest&&t.closest('#main>.top,#pmain>.top');
+   if(!onP&&!onT)return;sw={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now(),p:!!onP}},{passive:true});
+ addEventListener('touchmove',e=>{if(sw&&document.body.classList.contains('dragging'))sw=null},{passive:true});
+ addEventListener('touchend',e=>{if(!sw)return;const s=sw;sw=null;const c=e.changedTouches[0],dx=c.clientX-s.x,dy=c.clientY-s.y;
+   if(Date.now()-s.t>700||Math.abs(dy)<35||Math.abs(dy)<Math.abs(dx)*1.5)return;
+   const open=document.body.classList.contains('ro');if(dy<0&&open)setPills(false);else if(dy>0&&!open&&!s.p)setPills(true)},{passive:true})}
 onbeforeunload=e=>{if(dirty){e.preventDefault();e.returnValue=''}};
 render();
 if(tagFix.length)try{localStorage.setItem(LS,JSON.stringify(db))}catch(e){}
