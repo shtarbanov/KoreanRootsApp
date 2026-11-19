@@ -227,10 +227,10 @@ tr.hit>td{animation:hit 2.2s ease-out}
 .ed{display:inline-flex;align-items:center;padding:3px 7px}
 .ac{white-space:nowrap}
 .hid{text-decoration:line-through;opacity:.55}
-.row2 label.hj{flex:0 0 76px}
+.row2 label.hj{flex:0 0 76px}dialog input.ro{background:transparent;color:var(--mut);cursor:default}dialog input.ro:focus{outline:none;box-shadow:none;border-color:var(--line)}
 .tsug{margin-top:8px;font-size:13px;color:var(--mut)}.tsug ul{margin:6px 0;padding:0;list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border:1px dashed var(--bd);border-radius:6px;overflow:hidden;font-size:14px;color:var(--fg)}
 .tsug li{padding:6px 10px;border-right:1px dashed var(--bd);border-bottom:1px dashed var(--bd)}
-.tsug li:nth-child(2n){border-right:0}
+.tsug li:nth-child(2n){border-right:0}.tsug li:last-child:nth-child(odd){grid-column:1/-1;border-right:0}
 .tsug li:last-child,.tsug li:nth-last-child(2):nth-child(odd){border-bottom:0}.tsug p{margin:6px 0 0;font-size:14px;color:var(--fg)}.tsug .warn{color:var(--no)}
 .bx select.t{width:132px;flex:none;margin:0;padding:4px 6px;font-size:14px}
 @media (max-width:700px){.bx select.t{font-size:16px;padding:8px}}
@@ -486,6 +486,15 @@ function treeModel(r){
   return node('root',r,'r:'+rk(r),0,null)}
 // Right-click (or long-press on a phone) menu for the tree
 const isOpenNode=n=>n.open,cmClose=()=>{const m=$('#cmenu');if(m)m.remove()};
+// Menu for a root pill or the root title: right-click, or press and hold a pill on a phone
+function rootMenu(i,x,y){const o=db.roots[i];if(!o)return;const k=rk(o),kn=!!K().roots[k];
+  cmShow(x,y,`<b>${esc(k)}</b>${o.h?' '+esc(o.h):''} ${esc(o.m||'')}`,[
+    ...(i!==cur||master||page!=='roots'?[{t:'Open root',fn:()=>{if(page!=='roots')setPage('roots');master=false;open(i)}}]:[]),
+    {t:'Listen',fn:()=>say(o.c)},
+    {t:kn?'Mark as not learned':'Mark as learned',fn:()=>{toggleK('roots',k);render();toast(k+(kn?' unmarked as learned':' marked as learned ✓'))}},'-',
+    {t:'Edit root…',fn:()=>{if(i!==cur||master){master=false;open(i)}editRoot()}},
+    {t:`Another ${o.c} root…`,fn:()=>newRoot(o.c,'','',null,true)},'-',
+    {t:'Google Translate',fn:()=>gTrans(o.c)}])}
 function cmShow(x,y,title,items){cmClose();const m=document.createElement('div');m.id='cmenu';m.className='cmenu';m.setAttribute('role','menu');
   m.innerHTML=(title?`<div class="cmh">${title}</div>`:'')+items.map((it,k)=>it==='-'?'<hr>':`<button type="button" role="menuitem" data-k="${k}"${it.dis?' disabled':''}>${it.ico||''}<span>${esc(it.t)}</span></button>`).join('');
   m._t=Date.now();document.body.append(m);const w=m.offsetWidth,h=m.offsetHeight;m.style.left=Math.max(6,Math.min(x,innerWidth-w-6))+'px';m.style.top=Math.max(6,Math.min(y,innerHeight-h-6))+'px';
@@ -528,7 +537,7 @@ function treeMenu(e,box,r){e.preventDefault();const el=e.target.closest('.tn'),f
       ...(n.depth?[{t:'Open root',fn:()=>open(db.roots.indexOf(o))}]:[]),
       ...(n.depth&&n.all.length?[{t:n.open?'Collapse':'Expand',fn:()=>treeRedraw(r,()=>tOpen.set(n.path,!n.open))}]:[]),
       {t:kn?'Mark as not learned':'Mark as learned',fn:()=>{toggleK('roots',k);render();toast(k+(kn?' unmarked as learned':' marked as learned ✓'))}},
-      ...(n.depth?[]:[{t:'Edit root…',fn:()=>editRoot()}]),{t:'Google Translate',fn:()=>gTrans(o.c)}])}
+      ...(n.depth?[]:[{t:'Edit root…',fn:()=>editRoot()},{t:`Another ${o.c} root…`,fn:()=>newRoot(o.c,'','',null,true)}]),{t:'Google Translate',fn:()=>gTrans(o.c)}])}
   const sy=n.o; // syllable with no table yet
   return cmShow(x,y,`<b>${esc(sy.c)}</b> ${esc(sy.g||'')}`,[
     {t:'Listen',fn:()=>say(sy.c)},
@@ -779,7 +788,7 @@ function showHelp(){
 <li><b>+ Add word</b> adds a word; a row appears for each syllable where you can set its meaning and, if a syllable has several roots, pick which one.</li>
 <li><b>✎</b> on a row edits the word. <b>Remove…</b> in that dialog asks whether to hide it from this table only or delete it everywhere.</li>
 <li>When two roots share a syllable (several 사, for example), they’re numbered automatically: 사¹, 사², …</li>
-<li>The pencil next to the root’s name edits the root (meaning, hanja); <b>+ New root</b> at the end of the list adds one.</li></ul>
+<li>The pencil next to the root’s name edits the root (meaning, hanja); <b>+ New root</b> at the end of the list adds one. Typing a syllable that already has a root makes a second one with its own hanja and meaning (numbered, like 대¹ and 대²); the menu on a root offers this too. Right-click a root pill or the root’s title (press and hold a pill on a phone, then let go without moving) for that menu: open, listen, mark as learned, edit, another root with the same syllable, Google Translate.</li></ul>
 <h4>Tree view</h4>
 <ul><li>The <b>table / tree</b> switch next to the root’s name changes the view. The tree starts with the root on the left, its words to the right, then each word’s other roots.</li>
 <li><b>Tap</b> a root or word to open or close its branch and follow connections from root to root; <b>↗</b> opens that root’s page.</li>
@@ -818,7 +827,7 @@ function modal(title,body,btns){
   // On touch screens, focus the dialog itself rather than its first field, so the phone keyboard only opens when a field is tapped
   addX(d);
   if(matchMedia('(pointer:coarse)').matches){const z=document.createElement('span');z.tabIndex=-1;z.autofocus=true;z.className='af';d.querySelector('form').prepend(z)}
-  else{const fi=d.querySelector('form input:not([type=hidden]),form select,form textarea');if(fi)fi.autofocus=true}
+  else{const fi=d.querySelector('form input:not([type=hidden]):not([readonly]):not([type=radio]),form select,form textarea');if(fi)fi.autofocus=true}
   d.showModal();return d}
 function addX(d){if(d.querySelector('.xw'))return d;const w=document.createElement('div');w.className='xw';w.innerHTML='<button type="button" class="x" aria-label="Close" title="Close"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg></button>';w.firstChild.onclick=()=>d.close();d.querySelector('form').prepend(w)}
 function outClose(d){let dn=false;d.addEventListener('mousedown',e=>{dn=e.target===d&&out(d,e)});d.addEventListener('click',e=>{if(dn&&e.target===d&&out(d,e))d.close();dn=false})}
@@ -843,8 +852,8 @@ function retag(r,nt){const o=r.c+(r.t||'');
   for(const w of db.words){for(const s of w.s)if(s.c===r.c&&(s.t||'')===(r.t||''))s.t=nt;if(w.x)w.x=w.x.map(k=>k===o?r.c+nt:k)}
   const kr=db.known.roots;if(kr[o]){kr[r.c+nt]=kr[o];delete kr[o]}
   r.t=nt}
-function newRoot(c0,t0,g,after){const pre=parseGloss(findGloss(c0,t0,g));
-  const d=modal(c0?`No table for ${esc(c0+t0)} yet`:'New root',f('c','Syllable',c0)+'<div class="tsug" id="tsug"></div>'+mh(pre.m,pre.h),
+function newRoot(c0,t0,g,after,same){const pre=same?{m:'',h:''}:parseGloss(findGloss(c0,t0,g));
+  const d=modal(same?`Another ${esc(c0)} root`:c0?`No table for ${esc(c0+t0)} yet`:'New root',(same?'<p class="sub" style="margin-top:0">Same syllable, with its own hanja and meaning.</p>':'')+'<div class="row2">'+f('c','Syllable',c0).replace('<label>','<label class="hj">')+f('m','Meaning',pre.m)+f('h','Hanja',pre.h).replace('<label>','<label class="hj">')+'</div><div class="tsug" id="tsug"></div>',
   [{label:'Cancel'},{label:'Create table',fn:d=>{const c=v(d,'c').trim();if(!c)return false;
     let tg=t0;
     if(t0&&c===c0){if(db.roots.some(r=>r.c==c&&r.t==t0)){note('Root already exists','A root with this syllable and tag already exists.');return false}}
@@ -867,7 +876,7 @@ function removeRoot(i){const r=db.roots[i],k=rk(r);db.roots.splice(i,1);delete d
   for(const w of db.words)if(w.x){w.x=w.x.filter(x=>x!==k);if(!w.x.length)delete w.x}
   hist=hist.filter(h=>h!==i).map(h=>h>i?h-1:h);cur=Math.max(0,Math.min(i,db.roots.length-1));changed();render()}
 function editRoot(){const r=db.roots[cur],empty=!rootWords(r).length;
-  modal(esc(rk(r)),mh(r.m,r.h),[
+  modal('Edit root','<div class="row2"><label class="hj">Syllable<input value="'+esc(rk(r))+'" lang="ko" readonly tabindex="-1" class="ro" title="The syllable can’t be changed"></label>'+f('m','Meaning',r.m)+f('h','Hanja',r.h).replace('<label>','<label class="hj">')+'</div>',[
     ...(empty?[{label:'Delete root',fn:ed=>{modal('Delete this root?',`<p>${esc(rk(r))} has no words, so it will be removed.</p>`,[{label:'Cancel'},{label:'Delete',fn:()=>{removeRoot(cur);ed.close()}}]);return false}}]:[]),
     {label:'Cancel'},{label:'Save',fn:d=>{r.m=v(d,'m').trim();r.h=v(d,'h').trim();changed();render()}}])}
 function wordForm(i,pre){
@@ -1220,10 +1229,10 @@ function pillDrag(o){let st=null,side=null;
     if(!row&&!tgt&&ps.length){const f=ps[0].getBoundingClientRect(),l=ps[ps.length-1].getBoundingClientRect();if(y<f.top){tgt=ps[0];after=false}else if(y>l.bottom){tgt=ps[ps.length-1];after=true}}
     if(tgt){const ref=after?tgt.nextSibling:tgt;if(ref!==b)side.insertBefore(b,ref)}
     const sr=side.getBoundingClientRect();if(side.scrollHeight>side.clientHeight){if(y<sr.top+30)side.scrollTop-=8;else if(y>sr.bottom-30)side.scrollTop+=8}}
-  function end(drop){clearTimeout(st.t);if(st.on){st.g.remove();st.el.classList.remove('ph');document.body.classList.remove('dragging');justDragged=true;setTimeout(()=>justDragged=false,0);
+  function end(drop){clearTimeout(st.t);const tap=st.on&&st.touch&&!st.moved&&o.menu,el=st.el,ex=st.x,ey=st.y;if(st.on){st.g.remove();st.el.classList.remove('ph');document.body.classList.remove('dragging');justDragged=true;setTimeout(()=>justDragged=false,0);
       const order=pills().map(o.key),changedOrder=drop&&order.some((v,k)=>v!==k);
       if(changedOrder)o.commit(order);o.redraw()}
-    st=null}
+    st=null;if(tap)o.menu(el,ex,ey)}
   document.addEventListener('pointerdown',e=>{const b=e.target.closest(o.side+' '+o.pill);if(!b||e.button>0)return;side=b.closest(o.side);
     st={el:b,id:e.pointerId,x:e.clientX,y:e.clientY,on:false,touch:e.pointerType!=='mouse'};
     if(st.touch)st.t=setTimeout(()=>{if(st&&!st.on){begin()}},380)});
@@ -1234,14 +1243,15 @@ function pillDrag(o){let st=null,side=null;
   addEventListener('pointercancel',e=>{if(st&&e.pointerId===st.id)end(false)});
   // While a long-press drag is active, stop the page from scrolling under the finger
   addEventListener('touchmove',e=>{if(st&&st.on)e.preventDefault()},{passive:false});
-  document.addEventListener('contextmenu',e=>{if(e.target.closest(o.side+' '+o.pill))e.preventDefault()});
+  document.addEventListener('contextmenu',e=>{const b=e.target.closest(o.side+' '+o.pill);if(!b)return;e.preventDefault();if(o.menu&&!st)o.menu(b,e.clientX,e.clientY)});
   addEventListener('keydown',e=>{if(e.key==='Escape'&&st&&st.on){restore();end(false)}})}
 addEventListener('click',e=>{if(justDragged){e.stopPropagation();e.preventDefault()}},true);
-pillDrag({side:'#side',pill:'.ri[data-i]',key:p=>+p.dataset.i,anchor:()=>$('#newroot'),redraw:()=>render(),
+pillDrag({side:'#side',pill:'.ri[data-i]',key:p=>+p.dataset.i,anchor:()=>$('#newroot'),redraw:()=>render(),menu:(b,x,y)=>rootMenu(+b.dataset.i,x,y),
   commit:order=>{const cr=db.roots[cur],hr=hist.map(h=>db.roots[h]);db.roots=order.map(k=>db.roots[k]);cur=Math.max(0,db.roots.indexOf(cr));hist=hr.map(r=>db.roots.indexOf(r)).filter(k=>k>=0);changed()}});
 pillDrag({side:'#pside',pill:'.ri[data-pi]',key:p=>+p.dataset.pi,anchor:sd=>sd.querySelector('[data-pf="-"]'),redraw:()=>renderPhrases(),
   commit:order=>{const pl=phPlaces();db.placeOrder=order.map(k=>pl[k]);changed()}});
 
+document.addEventListener('contextmenu',e=>{const h=e.target.closest('#main .top h2');if(!h||master||page!=='roots'||e.target.closest('button'))return;e.preventDefault();rootMenu(cur,e.clientX,e.clientY)});
 onbeforeunload=e=>{if(dirty){e.preventDefault();e.returnValue=''}};
 render();
 if(tagFix.length)try{localStorage.setItem(LS,JSON.stringify(db))}catch(e){}
