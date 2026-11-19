@@ -40,7 +40,7 @@ button:hover{border-color:var(--acc)}
 aside{width:190px;flex:none;display:flex;flex-direction:column;gap:3px}
 .ri{text-align:left;border-color:transparent;background:none;padding:3px 8px}
 .ri.on{background:var(--card);border-color:var(--acc)}
-.ri small{color:var(--mut)}.ri.kn{color:var(--knfg)}.ri.add{color:var(--acc);margin-top:6px}
+.ri small{color:var(--mut)}.ri.kn{color:var(--knfg)}.ri.add{color:var(--acc);margin-top:6px}.ri.add.dupt{border:1.5px dashed var(--acc);background:color-mix(in srgb,var(--acc) 8%,var(--card))}.ri.add.over{background:var(--acc);color:#fff;border-style:solid}.dg.ondup{opacity:.75}
 main{flex:1;min-width:0}
 footer{padding:12px 16px calc(20px + env(safe-area-inset-bottom,0px));text-align:center;font-size:13px;color:var(--mut)}
 .top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
@@ -782,7 +782,7 @@ function showHelp(){
 <ul><li><b>Words</b> holds your roots and words. <b>Phrases</b> holds sentences you collect. Switch with the tabs at the top; on a phone, the back gesture also returns from Phrases to Words.</li></ul>
 <h4>Roots list</h4>
 <ul><li>Pick a root from the list (on a phone, the arrow next to the root’s name shows or hides the list).</li>
-<li><b>Reorder</b> roots by dragging them: with a mouse just drag; on a phone press and hold, then drag. Drag off the list to cancel.</li>
+<li><b>Reorder</b> roots by dragging them: with a mouse just drag; on a phone press and hold, then drag. Drag off the list to cancel. While you drag, <b>+ New root</b> turns into <b>Duplicate</b>: drop a root on it to add another root with the same syllable but its own hanja and meaning.</li>
 <li>Native Korean roots (no hanja, like 님) have a <b>dashed outline</b>.</li>
 <li>When you’ve jumped from another root, a <b>← link</b> at the top of the list takes you back. <b>Next</b> under the words goes to the next root in list order.</li>
 <li><b>All words</b> shows the whole word list, which roots show each word, and filters by text, root or learned status. A crossed-out root means the word was removed from that root’s table.</li></ul>
@@ -791,7 +791,7 @@ function showHelp(){
 <li><b>+ Add word</b> adds a word; a row appears for each syllable where you can set its meaning and, if a syllable has several roots, pick which one.</li>
 <li><b>✎</b> on a row edits the word. <b>Remove…</b> in that dialog asks whether to hide it from this table only or delete it everywhere.</li>
 <li>When two roots share a syllable (several 사, for example), they’re numbered automatically: 사¹, 사², …</li>
-<li>The pencil next to the root’s name edits the root (meaning, hanja); <b>+ New root</b> at the end of the list adds one. Typing a syllable that already has a root makes a second one with its own hanja and meaning (numbered, like 대¹ and 대²); the menu on a root offers this too. Right-click a root pill or the root’s title (press and hold a pill on a phone, then let go without moving) for that menu: open, listen, mark as learned, edit, another root with the same syllable, Google Translate.</li></ul>
+<li>The pencil next to the root’s name edits the root (meaning, hanja); <b>+ New root</b> at the end of the list adds one. Typing a syllable that already has a root makes a second one with its own hanja and meaning (numbered, like 대¹ and 대²); the menu on a root offers this too. Right-click a root pill or the root’s title (on a computer) for that menu: open, listen, mark as learned, edit, another root with the same syllable, Google Translate.</li></ul>
 <h4>Tree view</h4>
 <ul><li>The <b>table / tree</b> switch next to the root’s name changes the view. The tree starts with the root on the left, its words to the right, then each word’s other roots.</li>
 <li><b>Tap</b> a root or word to open or close its branch and follow connections from root to root; <b>↗</b> opens that root’s page.</li>
@@ -1215,13 +1215,17 @@ function pillDrag(o){let st=null,side=null;
   const restore=()=>pills().sort((a,b)=>o.key(a)-o.key(b)).forEach(p=>side.insertBefore(p,o.anchor(side)));
   function begin(){const b=st.el,r=b.getBoundingClientRect();st.on=true;st.out=false;st.dx=st.x-r.left;st.dy=st.y-r.top;
     const g=b.cloneNode(true);g.classList.add('dg');g.classList.remove('on');g.style.width=r.width+'px';g.style.height=r.height+'px';if(st.touch)g.classList.add('lift');document.body.append(g);st.g=g;
-    b.classList.add('ph');document.body.classList.add('dragging');if(navigator.vibrate)try{navigator.vibrate(15)}catch(e){}move(st.x,st.y)}
+    b.classList.add('ph');document.body.classList.add('dragging');
+    const dt=o.dup&&o.dup.el(side);if(dt){st.dt=dt;dt._h=dt.innerHTML;dt.innerHTML=o.dup.label;dt.classList.add('dupt')}
+    if(navigator.vibrate)try{navigator.vibrate(15)}catch(e){}move(st.x,st.y)}
   function move(x,y){const g=st.g;
     // Touch: lift the copy above the finger so it stays visible, and aim with the copy's centre rather than the hidden fingertip
     if(st.touch){const w=g.offsetWidth,h=g.offsetHeight,gx=Math.min(innerWidth-w-4,Math.max(4,x-w/2)),gy=Math.max(4,y-h-14);g.style.left=gx+'px';g.style.top=gy+'px';
       // Dead zone: holding still and letting go must leave the root where it was
       if(!st.moved&&Math.hypot(x-st.x,y-st.y)<10)return;st.moved=true;x=gx+w/2;y=gy+h/2}
     else{g.style.left=(x-st.dx)+'px';g.style.top=(y-st.dy)+'px'}
+    // Over the drop target (+ New root, shown as Duplicate): nothing moves, and letting go duplicates the root
+    if(st.dt){const tr=st.dt.getBoundingClientRect(),ov=x>=tr.left-4&&x<=tr.right+4&&y>=tr.top-4&&y<=tr.bottom+4;st.dt.classList.toggle('over',ov);st.g.classList.toggle('ondup',ov);st.over=ov;if(ov){st.out=false;st.g.classList.remove('out');restore();return}}
     // Outside the list: put everything back where it started, so the gap shows the original spot and letting go changes nothing
     const sr0=side.getBoundingClientRect(),M=16,out=x<sr0.left-M||x>sr0.right+M||y<sr0.top-M||y>sr0.bottom+M;
     st.out=out;st.g.classList.toggle('out',out);if(out){restore();return}
@@ -1232,10 +1236,11 @@ function pillDrag(o){let st=null,side=null;
     if(!row&&!tgt&&ps.length){const f=ps[0].getBoundingClientRect(),l=ps[ps.length-1].getBoundingClientRect();if(y<f.top){tgt=ps[0];after=false}else if(y>l.bottom){tgt=ps[ps.length-1];after=true}}
     if(tgt){const ref=after?tgt.nextSibling:tgt;if(ref!==b)side.insertBefore(b,ref)}
     const sr=side.getBoundingClientRect();if(side.scrollHeight>side.clientHeight){if(y<sr.top+30)side.scrollTop-=8;else if(y>sr.bottom-30)side.scrollTop+=8}}
-  function end(drop){clearTimeout(st.t);const tap=st.on&&st.touch&&!st.moved&&o.menu,el=st.el,ex=st.x,ey=st.y;if(st.on){st.g.remove();st.el.classList.remove('ph');document.body.classList.remove('dragging');justDragged=true;setTimeout(()=>justDragged=false,0);
+  function end(drop){clearTimeout(st.t);const dupEl=st.on&&st.over&&drop?st.el:null;if(dupEl){restore();drop=false}
+    if(st.dt){st.dt.innerHTML=st.dt._h;st.dt.classList.remove('dupt','over')}if(st.on){st.g.remove();st.el.classList.remove('ph');document.body.classList.remove('dragging');justDragged=true;setTimeout(()=>justDragged=false,0);
       const order=pills().map(o.key),changedOrder=drop&&order.some((v,k)=>v!==k);
       if(changedOrder)o.commit(order);o.redraw()}
-    st=null;if(tap)o.menu(el,ex,ey)}
+    st=null;if(dupEl)setTimeout(()=>o.dup.drop(dupEl),0)}
   document.addEventListener('pointerdown',e=>{const b=e.target.closest(o.side+' '+o.pill);if(!b||e.button>0)return;side=b.closest(o.side);
     st={el:b,id:e.pointerId,x:e.clientX,y:e.clientY,on:false,touch:e.pointerType!=='mouse'};
     if(st.touch)st.t=setTimeout(()=>{if(st&&!st.on){begin()}},380)});
@@ -1246,10 +1251,11 @@ function pillDrag(o){let st=null,side=null;
   addEventListener('pointercancel',e=>{if(st&&e.pointerId===st.id)end(false)});
   // While a long-press drag is active, stop the page from scrolling under the finger
   addEventListener('touchmove',e=>{if(st&&st.on)e.preventDefault()},{passive:false});
-  document.addEventListener('contextmenu',e=>{const b=e.target.closest(o.side+' '+o.pill);if(!b)return;e.preventDefault();if(o.menu&&!st)o.menu(b,e.clientX,e.clientY)});
+  document.addEventListener('contextmenu',e=>{const b=e.target.closest(o.side+' '+o.pill);if(!b)return;e.preventDefault();if(o.menu&&!st&&matchMedia('(pointer:fine)').matches)o.menu(b,e.clientX,e.clientY)});
   addEventListener('keydown',e=>{if(e.key==='Escape'&&st&&st.on){restore();end(false)}})}
 addEventListener('click',e=>{if(justDragged){e.stopPropagation();e.preventDefault()}},true);
-pillDrag({side:'#side',pill:'.ri[data-i]',key:p=>+p.dataset.i,anchor:()=>$('#newroot'),redraw:()=>render(),menu:(b,x,y)=>rootMenu(+b.dataset.i,x,y),
+pillDrag({side:'#side',pill:'.ri[data-i]',key:p=>+p.dataset.i,anchor:()=>$('#newroot'),redraw:()=>render(),
+  dup:{el:sd=>sd.querySelector('#newroot'),label:'⧉ Duplicate',drop:b=>{const r=db.roots[+b.dataset.i];if(r)newRoot(r.c,'','',null,true)}},menu:(b,x,y)=>rootMenu(+b.dataset.i,x,y),
   commit:order=>{const cr=db.roots[cur],hr=hist.map(h=>db.roots[h]);db.roots=order.map(k=>db.roots[k]);cur=Math.max(0,db.roots.indexOf(cr));hist=hr.map(r=>db.roots.indexOf(r)).filter(k=>k>=0);changed()}});
 pillDrag({side:'#pside',pill:'.ri[data-pi]',key:p=>+p.dataset.pi,anchor:sd=>sd.querySelector('[data-pf="-"]'),redraw:()=>renderPhrases(),
   commit:order=>{const pl=phPlaces();db.placeOrder=order.map(k=>pl[k]);changed()}});
