@@ -595,9 +595,8 @@ function drawTree(r){const box=$('#tree');if(!box)return;placeTbar();let fresh=!
   box.onclick=e=>{if(box._dragged){e.preventDefault();return}if(box._lpClick){box._lpClick=false;e.preventDefault();return}const el=e.target.closest('.tn');if(!el)return;const n=flat[+el.dataset.k];
     if(e.target.closest('.to')){open(db.roots.indexOf(n.o));return}
     if(!e.target.closest('button.tt')||!n.all||!n.all.length)return;
-    tOpen.set(n.path,!n.open);const sx=box.scrollLeft,sy=box.scrollTop;drawTree(r);box.scrollLeft=sx;box.scrollTop=sy;
-    // After opening a branch, bring its new nodes into view
-    if(!n.open){const kids=[...box.querySelectorAll('.tn')].filter(x=>x.dataset.p.startsWith(n.path+'/'));const c=kids[kids.length-1];if(c)c.scrollIntoView({block:'nearest',inline:'nearest'})}};
+    // The box you tapped stays exactly where it was; the rest of the tree reflows around it
+    const er=el.getBoundingClientRect();tOpen.set(n.path,!n.open);drawTree(r);treeRestore(box,{p:el.dataset.p,x:er.left,y:er.top+er.height/2})};
   els.forEach((e,k)=>e.dataset.p=flat[k].path)}
 // ===== Phrases page: sentences heard from elevators, buses, the metro…; tap a word to open it in the list or see its breakdown
 let page='roots',pf=null,pq='',pgPushed=false,keepPage=false;
