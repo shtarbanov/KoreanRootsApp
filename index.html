@@ -6,8 +6,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Korean Roots vocabulary</title>
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#fafaf7" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#17181a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#202225" media="(prefers-color-scheme: dark)">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -19,7 +19,7 @@
 <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon-16.png">
 <script>try{var t=localStorage.getItem('kr_theme_v1');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t}catch(e){}
 // Status and navigation bars of the installed app take this color, so keep it the same as the page background
-function syncBar(){var c=getComputedStyle(document.documentElement).getPropertyValue('--bg').trim();if(!c)return;document.querySelectorAll('meta[name=theme-color]').forEach(function(m){m.content=c;m.removeAttribute('media')})}
+function syncBar(){var c=getComputedStyle(document.documentElement).getPropertyValue('--card').trim();if(!c)return;document.querySelectorAll('meta[name=theme-color]').forEach(function(m){m.content=c;m.removeAttribute('media')})}
 document.addEventListener('DOMContentLoaded',syncBar);try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',syncBar)}catch(e){}</script>
 <style>
 :root{--bg:#fafaf7;--card:#fff;--fg:#1d1d1b;--mut:#6b6b66;--line:#e1e0d8;--acc:#1f4e9c;--kn:#fff59d;--knfg:#946f00;--no:#c9722b;--inp:#fff;--ph:#8a8a84;--bd:#9a9a94;--thumb:#fff;color-scheme:light}
